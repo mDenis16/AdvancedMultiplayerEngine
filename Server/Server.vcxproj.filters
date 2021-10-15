@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Shared">
+      <UniqueIdentifier>{8727f5b1-0c11-42b1-ab4a-1d4f1be83996}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shared\Entities">
+      <UniqueIdentifier>{b8d61b4a-ce72-4914-9ad1-395b89b46f0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Server">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Server\Network">
+      <UniqueIdentifier>{86e3e49d-eca3-4df3-b645-b6c72e06370b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shared\Network">
+      <UniqueIdentifier>{cdc21b7f-5a25-48a2-be39-bd9817b81406}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Server.cpp">
+      <Filter>Server</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Entities\Player.cpp">
+      <Filter>Shared\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Entities\Ped.cpp">
+      <Filter>Shared\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="Network.cpp">
+      <Filter>Server\Network</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Shared\Entities\Player.hpp">
+      <Filter>Shared\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Entities\Entity.hpp">
+      <Filter>Shared\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Entities\Ped.hpp">
+      <Filter>Shared\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Common.hpp">
+      <Filter>Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="Network.h">
+      <Filter>Server\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Server.hpp">
+      <Filter>Server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Entities\Entities.hpp">
+      <Filter>Shared\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Shared.hpp">
+      <Filter>Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Definitions.h">
+      <Filter>Shared</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
