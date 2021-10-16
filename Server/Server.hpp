@@ -1,5 +1,10 @@
 #pragma once
 
+#include <Common.hpp>
+#include <Shared.hpp>
+#include "Network.h"
+
+
 class Server
 {
 public:

@@ -126,6 +126,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>enet64.lib;Ws2_32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -152,8 +153,11 @@
   <ItemGroup>
     <ClCompile Include="..\Shared\Entities\Ped.cpp" />
     <ClCompile Include="..\Shared\Entities\Player.cpp" />
+    <ClCompile Include="..\Shared\Network\NetworkPacket.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="Network.cpp" />
     <ClCompile Include="Server.cpp" />
+    <ClCompile Include="Streamer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Shared\Common.hpp" />
@@ -162,9 +166,13 @@
     <ClInclude Include="..\Shared\Entities\Entity.hpp" />
     <ClInclude Include="..\Shared\Entities\Ped.hpp" />
     <ClInclude Include="..\Shared\Entities\Player.hpp" />
+    <ClInclude Include="..\Shared\Network\NetworkDefinitions.hpp" />
+    <ClInclude Include="..\Shared\Network\NetworkPacket.hpp" />
     <ClInclude Include="..\Shared\Shared.hpp" />
+    <ClInclude Include="ClientCmd.hpp" />
     <ClInclude Include="Network.h" />
     <ClInclude Include="Server.hpp" />
+    <ClInclude Include="Streamer.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
