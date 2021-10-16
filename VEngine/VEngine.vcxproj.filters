@@ -1,0 +1,128 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="GTA">
+      <UniqueIdentifier>{a32453b9-a142-47f0-a81a-18c132cd17af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine">
+      <UniqueIdentifier>{6f7866aa-9e5f-4db5-96b2-0348c57b73fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Memory">
+      <UniqueIdentifier>{1340cfd1-a3ca-4ca1-86b5-bcf30a973786}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Hooks">
+      <UniqueIdentifier>{13098c67-d07d-4aa7-9795-1d1a5a34a2f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Functions">
+      <UniqueIdentifier>{78c01a9b-c66f-4332-8732-3abe055650c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Events">
+      <UniqueIdentifier>{cbb15971-f0d1-4081-bad8-f17692c73f62}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="enums.hpp">
+      <Filter>GTA</Filter>
+    </ClInclude>
+    <ClInclude Include="natives.hpp">
+      <Filter>GTA</Filter>
+    </ClInclude>
+    <ClInclude Include="NativeInvoker.hpp">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="crossmap.hpp">
+      <Filter>GTA</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities.hpp">
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Hooks.hpp">
+      <Filter>Engine\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine.hpp">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Pointer.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="EventsHooks.hpp">
+      <Filter>Engine\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="script_program.hpp">
+      <Filter>GTA</Filter>
+    </ClInclude>
+    <ClInclude Include="jooat.hpp">
+      <Filter>GTA</Filter>
+    </ClInclude>
+    <ClInclude Include="ScriptHook.hpp">
+      <Filter>Engine\Functions</Filter>
+    </ClInclude>
+    <ClInclude Include="VmtHook.hpp">
+      <Filter>Engine\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="nativeList.hpp">
+      <Filter>GTA</Filter>
+    </ClInclude>
+    <ClInclude Include="framework.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Pattern.hpp">
+      <Filter>Memory</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NativeInvoker.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Utilities.cpp">
+      <Filter>Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Hooks.cpp">
+      <Filter>Engine\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Functions.cpp">
+      <Filter>Engine\Functions</Filter>
+    </ClCompile>
+    <ClCompile Include="EventsHooks.cpp">
+      <Filter>Engine\Events</Filter>
+    </ClCompile>
+    <ClCompile Include="ScriptHook.cpp">
+      <Filter>Engine\Functions</Filter>
+    </ClCompile>
+    <ClCompile Include="VmtHook.cpp">
+      <Filter>Engine\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="Pattern.cpp">
+      <Filter>Memory</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Functions.hpp">
+      <Filter>Engine\Functions</Filter>
+    </None>
+  </ItemGroup>
+</Project>
