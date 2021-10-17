@@ -26,26 +26,26 @@ void Network::Initialize(std::uint32_t port, int maxClients)
 			else if (ev.type == ENET_EVENT_TYPE_RECEIVE) {
 				NetworkPacket* newMessage = new NetworkPacket(ev.peer, ev.packet);
 
-				SAFE_MODIFY(m_incomingMessages);
-				m_incomingMessages.push(newMessage);
+				SAFE_MODIFY(IncomingPackets);
+				IncomingPackets.push(newMessage);
 				
 				WakeupExecutor = true;
 			}
 		}
 
 		if (WakeupExecutor)
-			THREAD_WAKE(Executor);
+			THREAD_WAKE(HandleIncomingFlow);
 		
 	}
 
 }
-void Network::QueueExecutor()
+void Network::HandleIncomingFlow()
 {
-	debug("NetworkThread : Create => QueueExecutor");
+	debug("NetworkThread : Create => HandleIncomingFlow");
 
 	while (true) {
 
-		THREAD_WAIT(Executor);
+		THREAD_WAIT(HandleIncomingFlow);
 		
 		SAFE_MODIFY(IncomingPackets);
 
@@ -66,6 +66,7 @@ void Network::QueueExecutor()
 
 		}
 
-		THREAD_SLEEP(Executor);
+
+		THREAD_SLEEP(HandleIncomingFlow);
 	}
 }

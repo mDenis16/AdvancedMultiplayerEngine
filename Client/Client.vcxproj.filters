@@ -13,6 +13,27 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Client">
+      <UniqueIdentifier>{4f9e9ceb-73b5-4d55-ba8b-ecfed32044ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Client\Network">
+      <UniqueIdentifier>{b30005c8-cde2-484d-874b-cce727943947}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Client\Streamer">
+      <UniqueIdentifier>{c342930d-b85f-4be1-9d7b-0266e003aec2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shared">
+      <UniqueIdentifier>{5028d8b4-cf14-480d-bc19-1178130a687e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shared\ClientCmd">
+      <UniqueIdentifier>{12da9a79-8403-4904-927f-fb84d4672f93}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shared\Entities">
+      <UniqueIdentifier>{bcd61580-d28e-41f7-8964-637462c3e658}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shared\Network">
+      <UniqueIdentifier>{7ed79312-7770-45e3-aa85-f049492928b6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -21,13 +42,61 @@
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Client.hpp">
+      <Filter>Client</Filter>
+    </ClInclude>
+    <ClInclude Include="Network.hpp">
+      <Filter>Client\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Network\NetworkPacket.hpp">
+      <Filter>Shared\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Network\NetworkDefinitions.hpp">
+      <Filter>Shared\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Definitions.h">
+      <Filter>Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Shared.hpp">
+      <Filter>Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Common.hpp">
+      <Filter>Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Entities\Entity.hpp">
+      <Filter>Shared\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Entities\Ped.hpp">
+      <Filter>Shared\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Entities\Player.hpp">
+      <Filter>Shared\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Entities\Entities.hpp">
+      <Filter>Shared\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\ClientCmd\ClientCmd.hpp">
+      <Filter>Shared\ClientCmd</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Client.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Client.cpp">
+      <Filter>Client</Filter>
+    </ClCompile>
+    <ClCompile Include="Network.cpp">
+      <Filter>Client\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Network\NetworkPacket.cpp">
+      <Filter>Shared\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Entities\Ped.cpp">
+      <Filter>Shared\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Entities\Player.cpp">
+      <Filter>Shared\Entities</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

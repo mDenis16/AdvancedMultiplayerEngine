@@ -12,14 +12,19 @@ public:
 
 	void Initialize(std::uint32_t port, int maxClients);
 
-private:
+	
+
+	VARIABLE_THREAD(HandleIncomingFlow);
+	VARIABLE_THREAD(HandleOutgoingFlow);
+
 
 	SAFE_PROP(std::queue<NetworkPacket*>, IncomingPackets);
 	SAFE_PROP(std::queue<NetworkPacket*>, OutgoingPackets);
+
 	SAFE_PROP(std::vector<Player*>, Entities);
 
-	void QueueExecutor();
-	VARIABLE_THREAD(Executor);
+	
+
 
 	ENetHost* HostListener = nullptr;
 };

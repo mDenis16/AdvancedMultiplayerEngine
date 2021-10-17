@@ -78,6 +78,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>F:\includes\glm-master;$(IncludePath);D:\repos\AdvancedMultiplayerEngine\Shared;F:\includes\ENet\include</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);F:\includes\ENet;</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -122,14 +124,18 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>
       </SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>enet64.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <Lib>
+      <AdditionalDependencies>enet64.lib</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -151,11 +157,27 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\Shared\ClientCmd\ClientCmd.hpp" />
+    <ClInclude Include="..\Shared\Common.hpp" />
+    <ClInclude Include="..\Shared\Definitions.h" />
+    <ClInclude Include="..\Shared\Entities\Entities.hpp" />
+    <ClInclude Include="..\Shared\Entities\Entity.hpp" />
+    <ClInclude Include="..\Shared\Entities\Ped.hpp" />
+    <ClInclude Include="..\Shared\Entities\Player.hpp" />
+    <ClInclude Include="..\Shared\Network\NetworkDefinitions.hpp" />
+    <ClInclude Include="..\Shared\Network\NetworkPacket.hpp" />
+    <ClInclude Include="..\Shared\Shared.hpp" />
+    <ClInclude Include="Client.hpp" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="Network.hpp" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Shared\Entities\Ped.cpp" />
+    <ClCompile Include="..\Shared\Entities\Player.cpp" />
+    <ClCompile Include="..\Shared\Network\NetworkPacket.cpp" />
     <ClCompile Include="Client.cpp" />
+    <ClCompile Include="Network.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
