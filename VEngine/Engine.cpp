@@ -106,16 +106,6 @@ int Engine::GameVersionToSearchDepth(int version)
 }
 
 void Engine::InitalizePointers() {
-	/*main_batch.add("Native handlers", "48 8D 0D ? ? ? ? 48 8B 14 FA E8 ? ? ? ? 48 85 C0 75 0A", [this](memory::handle ptr)
-		{
-			m_native_registration_table = ptr.add(3).rip().as<rage::scrNativeRegistrationTable*>();
-			m_get_native_handler = ptr.add(12).rip().as<functions::get_native_handler_t>();
-		});
-
-		main_batch.add("Fix vectors", "83 79 18 00 48 8B D1 74 4A FF 4A 18 48 63 4A 18 48 8D 41 04 48 8B 4C CA", [this](memory::handle ptr)
-		{
-			m_fix_vectors = ptr.as<functions::fix_vectors_t>();
-		});*/
 
 	std::cout << "Initializing engine." << std::endl;
 
@@ -124,15 +114,21 @@ void Engine::InitalizePointers() {
 		Functions::m_native_registration_table = ptr.add(3).rip().as<RAGE::ScrNativeRegistrationTable*>();
 		Functions::m_get_native_handler = ptr.add(12).rip().as<Functions::get_native_handler_t>();
 	}
-
 	{
 		auto ptr = Memory::Pointer(MEMORY::PatternScan("83 79 18 00 48 8B D1 74 4A FF 4A 18 48 63 4A 18 48 8D 41 04 48 8B 4C CA"));
 		Functions::m_fix_vectors = ptr.as<Functions::fix_vectors_t>();
 	}
 	{
+		auto ptr = Memory::Pointer(MEMORY::PatternScan("45 33 F6 8B E9 85 C9 B8"));
+
+		Functions::m_script_threads = ptr.sub(4).rip().sub(8).as<decltype(Functions::m_script_threads)>();
+		Functions::m_run_script_threads = ptr.sub(0x1F).as<Functions::run_script_threads_t>();
+	}
+	{
 		GameVersion = Functions::GetGameVersion();
 		std::cout << "Game version " << GameVersion << std::endl;
 	}
+
 
 	{
 		NativeInvoker.Initialize();

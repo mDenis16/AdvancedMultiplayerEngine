@@ -2,6 +2,9 @@
 #include "natives.hpp"
 #include "NativeInvoker.hpp"
 #include "script_program.hpp"
+#include "jooat.hpp"
+#include "array.hpp"
+#include "gtaThread.h"
 
 namespace Functions {
 
@@ -17,4 +20,14 @@ namespace Functions {
 
     using fix_vectors_t = void(*)(RAGE::ScrNativeCallContext*);
     inline fix_vectors_t m_fix_vectors{};
+
+    using run_script_threads_t = bool(*)(std::uint32_t ops_to_execute);
+    inline run_script_threads_t m_run_script_threads{};
+
+    inline RAGE::atArray<RAGE::GtaThread*>* m_script_threads{};
+
+
+    template <typename F, typename ...Args>
+    void execute_as_script(RAGE::joaat_t script_hash, F&& callback, Args &&...args);
+
 }

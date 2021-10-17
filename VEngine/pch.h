@@ -9,5 +9,9 @@
 
 // add headers that you want to pre-compile here
 #include "framework.h"
+#define HEX_TO_UPPER(value) "0x" << std::hex << std::uppercase << (DWORD64)value << std::dec << std::nouppercase
+
+#define TRY_CLAUSE  __try
+#define EXCEPT_CLAUSE  __except (RAGE::script_exception_handler(GetExceptionInformation()), EXCEPTION_EXECUTE_HANDLER) { }
 
 #endif //PCH_H

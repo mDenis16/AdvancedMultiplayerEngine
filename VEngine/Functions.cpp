@@ -178,4 +178,27 @@ namespace Functions {
 			return -1;
 		}
 	}
+
+	template <typename F, typename ...Args>
+	void execute_as_script(RAGE::joaat_t script_hash, F&& callback, Args &&...args)
+	{
+		/*auto tls_ctx = RAGE::tlsContext::get();
+		for (auto thread : *Functions::m_script_threads)
+		{
+			if (!thread || !thread->m_context.m_thread_id || thread->m_context.m_script_hash != script_hash)
+				continue;
+
+			auto og_thread = tls_ctx->m_script_thread;
+
+			tls_ctx->m_script_thread = thread;
+			tls_ctx->m_is_script_thread_active = true;
+
+			std::invoke(std::forward<F>(callback), std::forward<Args>(args)...);
+
+			tls_ctx->m_script_thread = og_thread;
+			tls_ctx->m_is_script_thread_active = og_thread != nullptr;
+
+			return;
+		}*/
+	}
 }

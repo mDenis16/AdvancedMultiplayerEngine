@@ -84,6 +84,24 @@
     <ClInclude Include="Pattern.hpp">
       <Filter>Memory</Filter>
     </ClInclude>
+    <ClInclude Include="gtaThread.h">
+      <Filter>GTA</Filter>
+    </ClInclude>
+    <ClInclude Include="SysMemAllocator.hpp">
+      <Filter>GTA</Filter>
+    </ClInclude>
+    <ClInclude Include="array.hpp">
+      <Filter>GTA</Filter>
+    </ClInclude>
+    <ClInclude Include="script_handler.hpp">
+      <Filter>GTA</Filter>
+    </ClInclude>
+    <ClInclude Include="script_id.hpp">
+      <Filter>GTA</Filter>
+    </ClInclude>
+    <ClInclude Include="tsl_context.hpp">
+      <Filter>GTA</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

@@ -158,11 +158,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="array.hpp" />
     <ClInclude Include="crossmap.hpp" />
     <ClInclude Include="Engine.hpp" />
     <ClInclude Include="enums.hpp" />
     <ClInclude Include="EventsHooks.hpp" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="gtaThread.h" />
     <ClInclude Include="Hooks.hpp" />
     <ClInclude Include="jooat.hpp" />
     <ClInclude Include="NativeInvoker.hpp" />
@@ -172,7 +174,11 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="Pointer.h" />
     <ClInclude Include="ScriptHook.hpp" />
+    <ClInclude Include="script_handler.hpp" />
+    <ClInclude Include="script_id.hpp" />
     <ClInclude Include="script_program.hpp" />
+    <ClInclude Include="SysMemAllocator.hpp" />
+    <ClInclude Include="tsl_context.hpp" />
     <ClInclude Include="Utilities.hpp" />
     <ClInclude Include="VmtHook.hpp" />
   </ItemGroup>
