@@ -3,10 +3,8 @@
 class Client {
 public:
 
-	Network network;
 
-
-	virtual void OnFrameStage();
-	virtual void OnTick();
+	std::add_pointer_t<void() noexcept> OnTick;
+	std::add_pointer_t<void() noexcept> OnFrameStage;
 
 };

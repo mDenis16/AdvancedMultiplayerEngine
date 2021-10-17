@@ -9,7 +9,7 @@ Network::Network()
 {	
 	THREAD_START(HandleIncomingFlow, std::bind(&Network::HandleIncomingFlow, this));
 	THREAD_START(HandleOutgoingFlow, std::bind(&Network::HandleOutgoingFlow, this));
-
+	THREAD_START(HandleFlow, std::bind(&Network::HandleFlow, this));
 }
 
 Network::~Network()
@@ -17,33 +17,15 @@ Network::~Network()
 }
 
 void Network::HandleFlow() {
-	while (true) {
 
-		SAFE_MODIFY(IncomingPackets);
-
-		while (IncomingPackets.size() > 0) {
-			NetworkPacket* message = IncomingPackets.front();
-		
-			message->MarkAsExecuted();
-
-			//HandleMessage(message);
-
-			if (message->Executed) {
-				delete message;
-			}
-		}
-
-		Sleep(1000 / 30);
-	}
-}
-void Network::HandleIncomingFlow()
-{
 	while (true) {
 		ENetEvent ev;
+		bool NeedWake = false;
 		while (enet_host_service(Local, &ev, 0) > 0)
 			if (ev.type == ENET_EVENT_TYPE_CONNECT) {
 				this->SendHandshake();
 				this->EventConnect();
+				Connected = true;
 			}
 			else if (ev.type == ENET_EVENT_TYPE_DISCONNECT)
 			{
@@ -56,9 +38,36 @@ void Network::HandleIncomingFlow()
 				NetworkPacket* receivedPacket = new NetworkPacket(ev.peer, ev.packet);
 
 				IncomingPackets.push(receivedPacket);
+				NeedWake = true;
 			}
+
+		if (NeedWake)
+			THREAD_WAKE(HandleIncomingFlow);
+
 	}
-	Sleep(1000 / 30);
+	
+}
+void Network::HandleIncomingFlow()
+{
+
+	while (true) {
+		THREAD_WAIT(HandleOutgoingFlow)
+		SAFE_MODIFY(IncomingPackets);
+
+		while (IncomingPackets.size() > 0) {
+			NetworkPacket* message = IncomingPackets.front();
+
+			message->MarkAsExecuted();
+
+			HandlePacket(message);
+
+			if (message->Executed) {
+				delete message;
+			}
+		}
+
+	}
+	
 }
 
 
@@ -66,6 +75,8 @@ void Network::HandleOutgoingFlow()
 {
 	while (true) {
 		THREAD_WAIT(HandleOutgoingFlow)
+		SAFE_MODIFY(OutgoingPackets);
+
 		while (OutgoingPackets.size() > 0) {
 			NetworkPacket* message = OutgoingPackets.front();
 			OutgoingPackets.pop();
@@ -77,6 +88,8 @@ void Network::HandleOutgoingFlow()
 			enet_peer_send(Peer, 0, newPacket);
 
 		}
+
+		THREAD_SLEEP(HandleOutgoingFlow);
 	}
 }
 void Network::SendHandshake()

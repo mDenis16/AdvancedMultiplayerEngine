@@ -1,7 +1,9 @@
- class Player : public Entity
+ class Player : public Ped
 {
 public:
-	Player();
+
+
+	Player(std::uint32_t Handle);
 	~Player();
 
 private:

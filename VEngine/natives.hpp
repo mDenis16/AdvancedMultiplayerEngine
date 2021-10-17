@@ -72,19 +72,19 @@ namespace RAGE
 	//assert(sizeof(scrNativeCallContext) == 0xE0);
 }
 
-using Void = void;
-using Any = std::uint32_t;
-using Hash = std::uint32_t;
-using Entity = std::int32_t;
-using Player = std::int32_t;
-using FireId = std::int32_t;
-using Interior = std::int32_t;
-using Ped = Entity;
-using Vehicle = Entity;
-using Cam = std::int32_t;
-using Object = Entity;
-using Pickup = Object;
-using Blip = std::int32_t;
-using Camera = Entity;
-using ScrHandle = Entity;
-using Vector3 = glm::vec3;
+using NativeVoid = void;
+using NativeAny = std::uint32_t;
+using NativeHash = std::uint32_t;
+using NativeEntity = std::int32_t;
+using NativePlayer = std::int32_t;
+using NativeFireId = std::int32_t;
+using NativeInterior = std::int32_t;
+using NativePed = NativeEntity;
+using NativeVehicle = NativeEntity;
+using NativeCam = std::int32_t;
+using NativeObject = NativeEntity;
+using NativePickup = NativeObject;
+using NativeBlip = std::int32_t;
+using NativeCamera = NativeEntity;
+using NativeScrHandle = NativeEntity;
+using NativeVector3 = glm::vec3;

@@ -31,6 +31,9 @@
     <Filter Include="Engine\Events">
       <UniqueIdentifier>{cbb15971-f0d1-4081-bad8-f17692c73f62}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Multiplayer">
+      <UniqueIdentifier>{b750942f-c416-4e1d-a95d-03d494a92222}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -102,6 +105,9 @@
     <ClInclude Include="tsl_context.hpp">
       <Filter>GTA</Filter>
     </ClInclude>
+    <ClInclude Include="Multiplayer.hpp">
+      <Filter>Multiplayer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -136,6 +142,9 @@
     </ClCompile>
     <ClCompile Include="Pattern.cpp">
       <Filter>Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Multiplayer.cpp">
+      <Filter>Multiplayer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

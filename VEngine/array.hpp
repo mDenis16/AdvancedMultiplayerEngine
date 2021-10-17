@@ -204,6 +204,6 @@ namespace RAGE
         std::uint16_t m_size;
         std::uint16_t m_count;
     };
-    static_assert(sizeof(atArray<Hash>) == 0x10, "rage::atArray is not properly sized");
+    static_assert(sizeof(atArray<NativeHash>) == 0x10, "rage::atArray is not properly sized");
 #pragma pack(pop)
 }

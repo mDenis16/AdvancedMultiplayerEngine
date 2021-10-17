@@ -8,8 +8,7 @@ public:
 	Network();
 	~Network();
 
-	void HandleFlow();
-
+	VARIABLE_THREAD(HandleFlow);
 	VARIABLE_THREAD(HandleIncomingFlow);
 	VARIABLE_THREAD(HandleOutgoingFlow);
 
@@ -20,8 +19,10 @@ public:
 
 	void Connect(std::string& hostname, std::uint16_t port);
 
-	virtual void EventDisconnect();
-	virtual void EventConnect();
+	virtual void EventDisconnect() = 0;;
+	virtual void EventConnect() = 0;;
+	virtual void HandlePacket(NetworkPacket* packet) = 0;;
+
 
 
 	SAFE_PROP(std::queue<NetworkPacket*>, IncomingPackets);
@@ -30,5 +31,6 @@ public:
 	ENetHost* Local = nullptr;
 	ENetPeer* Peer = nullptr;
 	bool Connected = false;
+	int NetworkTickrate = 30;
 	
 };

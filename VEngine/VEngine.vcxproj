@@ -78,8 +78,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>F:\includes\glm-master;$(IncludePath);F:\includes\minhook-master\include;F:\includes\minhook-master\include;</IncludePath>
-    <LibraryPath>F:\includes\minhook-master\build\VC16\lib\Debug;$(LibraryPath)</LibraryPath>
+    <IncludePath>F:\includes\glm-master;$(IncludePath);F:\includes\minhook-master\include;D:\repos\AdvancedMultiplayerEngine;F:\includes\ENet\include;D:\repos\AdvancedMultiplayerEngine\Shared</IncludePath>
+    <LibraryPath>F:\includes\minhook-master\build\VC16\lib\Debug;$(LibraryPath);D:\repos\AdvancedMultiplayerEngine\Client\x64\Debug;F:\includes\ENet;</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -134,7 +134,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>libMinHook.x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libMinHook.x64.lib;Client.lib;enet64.lib;Ws2_32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -167,6 +167,7 @@
     <ClInclude Include="gtaThread.h" />
     <ClInclude Include="Hooks.hpp" />
     <ClInclude Include="jooat.hpp" />
+    <ClInclude Include="Multiplayer.hpp" />
     <ClInclude Include="NativeInvoker.hpp" />
     <ClInclude Include="nativeList.hpp" />
     <ClInclude Include="natives.hpp" />
@@ -188,6 +189,7 @@
     <ClCompile Include="EventsHooks.cpp" />
     <ClCompile Include="Functions.cpp" />
     <ClCompile Include="Hooks.cpp" />
+    <ClCompile Include="Multiplayer.cpp" />
     <ClCompile Include="NativeInvoker.cpp" />
     <ClCompile Include="Pattern.cpp" />
     <ClCompile Include="pch.cpp">
