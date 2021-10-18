@@ -19,9 +19,6 @@
     <Filter Include="Engine">
       <UniqueIdentifier>{6f7866aa-9e5f-4db5-96b2-0348c57b73fa}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Memory">
-      <UniqueIdentifier>{1340cfd1-a3ca-4ca1-86b5-bcf30a973786}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Engine\Hooks">
       <UniqueIdentifier>{13098c67-d07d-4aa7-9795-1d1a5a34a2f5}</UniqueIdentifier>
     </Filter>
@@ -33,6 +30,9 @@
     </Filter>
     <Filter Include="Multiplayer">
       <UniqueIdentifier>{b750942f-c416-4e1d-a95d-03d494a92222}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GTA\Memory">
+      <UniqueIdentifier>{1340cfd1-a3ca-4ca1-86b5-bcf30a973786}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -52,7 +52,7 @@
       <Filter>GTA</Filter>
     </ClInclude>
     <ClInclude Include="Utilities.hpp">
-      <Filter>Memory</Filter>
+      <Filter>GTA\Memory</Filter>
     </ClInclude>
     <ClInclude Include="Hooks.hpp">
       <Filter>Engine\Hooks</Filter>
@@ -61,7 +61,7 @@
       <Filter>Engine</Filter>
     </ClInclude>
     <ClInclude Include="Pointer.h">
-      <Filter>Memory</Filter>
+      <Filter>GTA\Memory</Filter>
     </ClInclude>
     <ClInclude Include="EventsHooks.hpp">
       <Filter>Engine\Events</Filter>
@@ -82,10 +82,10 @@
       <Filter>GTA</Filter>
     </ClInclude>
     <ClInclude Include="framework.h">
-      <Filter>Memory</Filter>
+      <Filter>GTA\Memory</Filter>
     </ClInclude>
     <ClInclude Include="Pattern.hpp">
-      <Filter>Memory</Filter>
+      <Filter>GTA\Memory</Filter>
     </ClInclude>
     <ClInclude Include="gtaThread.h">
       <Filter>GTA</Filter>
@@ -108,6 +108,9 @@
     <ClInclude Include="Multiplayer.hpp">
       <Filter>Multiplayer</Filter>
     </ClInclude>
+    <ClInclude Include="NativeThreadsafeExecutor.hpp">
+      <Filter>Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -120,7 +123,7 @@
       <Filter>Engine</Filter>
     </ClCompile>
     <ClCompile Include="Utilities.cpp">
-      <Filter>Memory</Filter>
+      <Filter>GTA\Memory</Filter>
     </ClCompile>
     <ClCompile Include="Hooks.cpp">
       <Filter>Engine\Hooks</Filter>
@@ -141,10 +144,13 @@
       <Filter>Engine\Hooks</Filter>
     </ClCompile>
     <ClCompile Include="Pattern.cpp">
-      <Filter>Memory</Filter>
+      <Filter>GTA\Memory</Filter>
     </ClCompile>
     <ClCompile Include="Multiplayer.cpp">
       <Filter>Multiplayer</Filter>
+    </ClCompile>
+    <ClCompile Include="NativeThreadsafeExecutor.cpp">
+      <Filter>Engine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

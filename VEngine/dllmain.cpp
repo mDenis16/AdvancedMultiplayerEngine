@@ -5,6 +5,9 @@
 #include "Engine.hpp"
 #include <MinHook.h>
 #include <chrono>
+#include <VEngine\NativeThreadsafeExecutor.hpp>
+#include "nativeList.hpp"
+
 
 unsigned long WINAPI initialize(void* instance) {
     AllocConsole();
@@ -30,6 +33,16 @@ unsigned long WINAPI initialize(void* instance) {
 
     while (!Engine::FailedInitialize) {
 
+        if (GetAsyncKeyState(0x4B)) {
+            NATIVE_FUNCTION({
+    Job->Callbacks[0] = GAMEPLAY::GET_GAME_TIMER();
+    Job->Callbacks[1] = 99;
+                }, 2);
+
+            std::cout << "callback" << Job->Callbacks[0] << std::endl;
+
+            NATIVE_END();
+        }
         if (GetAsyncKeyState(0x2E)) {
             Engine::FailedInitialize = true;
         }

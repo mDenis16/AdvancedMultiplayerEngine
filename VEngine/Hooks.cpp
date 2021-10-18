@@ -8,6 +8,7 @@
 #include "ScriptHook.hpp"
 #include "Functions.hpp"
 #include "nativeList.hpp"
+#include "NativeThreadsafeExecutor.hpp"
 
 namespace Hooks {
 
@@ -40,12 +41,13 @@ namespace Hooks {
 			if (!skip) {
 				double elapsedSeconds = elapsedMS / 1000.0; // Convert to seconds
 				double fps = numFrames / elapsedSeconds; // FPS is Frames / Seconds
-				std::cout << "fps : " << fps << std::endl;
+			//	std::cout << "fps : " << fps << std::endl;
 			}
 		
 			 auto ret = static_cast<decltype(&run_script_threads)>(run_script_threads_original)(ops_to_execute);
 
-			 
+			 NativeThreadSafe::ExecuteNativeQueue();
+
 			
 			 return ret;
 		} EXCEPT_CLAUSE

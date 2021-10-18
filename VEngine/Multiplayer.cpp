@@ -17,5 +17,5 @@ void MultiplayerNetwork::EventConnect()
 
 void MultiplayerNetwork::HandlePacket(NetworkPacket* packet)
 {
-	packet->Packet->userData
+	
 }

@@ -10,7 +10,9 @@
 #include <vector>
 #include <string>
 #include <string_view>
-
+#include <mutex>
+#include <functional>
+#include <queue>
 
 #include "natives.hpp"
 #include "crossmap.hpp"

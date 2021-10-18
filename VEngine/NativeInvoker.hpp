@@ -1,4 +1,7 @@
 #pragma once
+#include <stack>
+
+
 #define fullHashMapCount 6354
 #define fullHashMapDepth 24
 
@@ -92,6 +95,8 @@ public:
 	void Initialize();
 	NativeRegistration** registrationTable;
 	std::unordered_map<uint64_t, RAGE::ScrNativeHandler> foundHashCache;
+	
+	
 
 private:
 	NativeCallContext CallContext;
@@ -99,3 +104,4 @@ private:
 };
 
 inline CNativeInvoker NativeInvoker;
+

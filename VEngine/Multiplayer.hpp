@@ -9,4 +9,4 @@ public:
 
 };
 
-inline MultiplayerNetwork Multiplayer;
+//inline MultiplayerNetwork Multiplayer;
