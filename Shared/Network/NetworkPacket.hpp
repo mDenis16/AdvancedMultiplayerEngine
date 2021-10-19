@@ -1,9 +1,64 @@
 #pragma once
 
+enum  PacketFlags 
+{
+	None = 0,
+	StreamEntireNetwork = 1,
+};
+enum PacketType
+{
+	PlayerHandshake = 0,
+	PlayerJoin = 1,
+};
 class NetworkPacket {
 public:
+
+	~NetworkPacket();
+
+
+#if SERVER
+	/// <summary>
+	/// Used in streaming data to only one entity
+	/// </summary>
+	/// <param name="peer"></param>
+	/// <param name="packet"></param>
+	NetworkPacket(int packetType, ENetPeer* peer, ENetPacket* packet);
+
+	/// <summary>
+	/// Used in cases where we need flags
+	///	like reliable udp packet or compressed packet
+	/// </summary>
+	/// <param name="peer"></param>
+	/// <param name="packet"></param>
+	/// <param name="flags"></param>
+	NetworkPacket(int packetType, ENetPeer* peer, ENetPacket* packet, int flags);
+
+	/// <summary>
+	/// Used in case if we want to stream data over all entities
+	///	Except -> nullptr in case we need to skip one player
+	/// </summary>
+	/// <param name="packet"></param>
+	/// <param name="flags"></param>
+	NetworkPacket(int packetType,  int flags, ENetPeer* except = nullptr);
+
+
+
+
+
+#endif
+
+	void Send();
+
+	/// <summary>
+	/// Both exists in client and server
+	///	Used for incomming packets on both sides.
+	/// </summary>
+	/// <param name="peer"></param>
+	/// <param name="packet"></param>
 	NetworkPacket(ENetPeer* peer, ENetPacket* packet);
-	
+
+	NetworkPacket(int packetType, int flags);
+
 	uint8_t* mData;                         /**< Data building up. */
 	unsigned int mPos;                   /**< Position in the data. */
 	unsigned int mDataSize;              /**< Allocated datasize. */
@@ -11,6 +66,9 @@ public:
 	bool Reliable = false;
 	bool Outgoing = false;
 	bool Executed = false;
+
+    int Flags = 0;
+	int Type = -1;
 
 	size_t Current = 0;
 	size_t Lenght = 0;

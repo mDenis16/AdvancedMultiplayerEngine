@@ -3,23 +3,103 @@
 #include <Shared.hpp>
 #include <enet\enet.h>
 #include "NetworkPacket.hpp"
+#if SERVER
+#include "../Server/Network.h"
+#endif
+#if CLIENT
+#include "../Client/Network.hpp"
+#include "../EngineSimulator/Multiplayer.hpp"
+#endif
 
 
 #define NETWORK_MESSAGE_DEFAULT_SIZE 32
 #define NETWORK_MESSAGE_ALLOCATE_SIZE 64
 #undef min
 
+#if SERVER
+NetworkPacket::NetworkPacket(int packetType, int flags, ENetPeer* except)
+{
+	//Reliable = (packet->flags & ENET_PACKET_FLAG_RELIABLE) != 0;
+	Flags = flags;
+	Outgoing = true;
+	Type = packetType;
+
+	TargetPeer = nullptr;
+
+}
+NetworkPacket::~NetworkPacket()
+{
+	if (Packet != nullptr) {
+		enet_packet_destroy(Packet);
+	}
+	else if (mData != nullptr) {
+		free(mData);
+	}
+}
+NetworkPacket::NetworkPacket(int packetType, ENetPeer* peer, ENetPacket* packet, int flags)
+{
+	Flags = flags;
+	Outgoing = true;
+	Type = packetType;
+
+	TargetPeer = peer;
+
+	
+}
+#endif
+
 NetworkPacket::NetworkPacket(ENetPeer* peer, ENetPacket* packet)
 {
 	Reliable = (packet->flags & ENET_PACKET_FLAG_RELIABLE) != 0;
 
-
-	*mData = *packet->data;
+	TargetPeer = peer;
+	if (packet->data)
+	   mData = packet->data;
 	Lenght = packet->dataLength;
 	Packet = packet;
+	if (packet->data)
+	   Read(Type);
 
-	TargetPeer = peer;
 }
+
+NetworkPacket::NetworkPacket(int packetType, int flags)
+{
+	Flags = flags;
+	Flags |= ENET_PACKET_FLAG_NO_ALLOCATE;
+	Outgoing = true;
+	Type = packetType;
+
+}
+
+
+void NetworkPacket::Send()
+{
+#if SERVER
+	{
+		Write(Type);
+		std::lock_guard<std::mutex> guard(GameNetwork.OutgoingPackets_lock);
+		GameNetwork.OutgoingPackets.push(this);
+
+		std::lock_guard<std::mutex> guard2(GameNetwork.HandleOutgoingFlowMutex);
+		GameNetwork.HandleOutgoingFlowMutexCondFlag = true;
+		GameNetwork.HandleOutgoingFlowMutexCond.notify_all();
+
+	}
+	
+#endif
+
+#if CLIENT
+	Write(Type);
+	std::lock_guard<std::mutex> guard(Multiplayer.OutgoingPackets_lock);
+	Multiplayer.OutgoingPackets.push(this);
+
+	std::lock_guard<std::mutex> guard2(Multiplayer.HandleOutgoingFlowMutex);
+	Multiplayer.HandleOutgoingFlowMutexCondFlag = true;
+	Multiplayer.HandleOutgoingFlowMutexCond.notify_all();
+#endif
+}
+
+
 
 size_t NetworkPacket::ReadRaw(void* dst, size_t sz)
 {

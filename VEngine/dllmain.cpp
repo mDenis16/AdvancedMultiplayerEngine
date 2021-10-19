@@ -19,8 +19,8 @@ unsigned long WINAPI initialize(void* instance) {
 
     SetConsoleTitleA("VEngine Console");
 
-    while (!FindWindow(L"grcWindow", L"Grand Theft Auto V"))
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+  //  while (!FindWindow(L"grcWindow", L"Grand Theft Auto V"))
+    //    std::this_thread::sleep_for(std::chrono::seconds(1));
 
     Engine::InitalizePointers();
     std::cout << "Initalizing hooks." << std::endl;
@@ -39,7 +39,7 @@ unsigned long WINAPI initialize(void* instance) {
     Job->Callbacks[1] = 99;
                 }, 2);
 
-            std::cout << "callback" << Job->Callbacks[0] << std::endl;
+            std::cout << "GET_GAME_TIMER " << Job->Callbacks[0] << std::endl;
 
             NATIVE_END();
         }

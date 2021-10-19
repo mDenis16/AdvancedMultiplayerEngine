@@ -8,4 +8,8 @@ int main() {
 
 	server.Initialize(5555);
 
+	while(true)
+	{
+		
+	}
 }

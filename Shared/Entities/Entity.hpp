@@ -12,11 +12,11 @@ public:
 
 	glm::vec3 Position;
 
-	std::uint32_t Handle = 0;
+	std::uint32_t EntityHandle = 0;
 #if CLIENT
 	std::uint32_t GameHandle = 0;
 #else 
-	ENetPeer* m_peer = nullptr;
+	ENetPeer* Peer = nullptr;
 #endif
 
 	std::uint32_t Dimension = 0;

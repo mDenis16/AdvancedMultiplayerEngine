@@ -17,7 +17,7 @@ public:
 
 	static void OnNetworkReleaseMessage(ENetPacket* packet) { delete (NetworkPacket*)packet->userData; }
 
-	void Connect(std::string& hostname, std::uint16_t port);
+	void Connect(std::string hostname, std::uint16_t port);
 
 	virtual void EventDisconnect() = 0;;
 	virtual void EventConnect() = 0;;
@@ -30,7 +30,9 @@ public:
 
 	ENetHost* Local = nullptr;
 	ENetPeer* Peer = nullptr;
-	bool Connected = false;
+	
+	std::atomic<bool> Connected{ false };
+
 	int NetworkTickrate = 30;
 	
 };

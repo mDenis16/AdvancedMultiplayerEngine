@@ -1,3 +1,4 @@
+#pragma once
 
 class Ped : public Entity {
 public:

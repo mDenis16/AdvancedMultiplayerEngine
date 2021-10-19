@@ -11,8 +11,7 @@ Server::~Server()
 
 void Server::Initialize(std::uint32_t port)
 {
-	GameNetwork.Initialize(port, 500);
-
+	GameNetwork.Initialize(port, 30);
 
 }
 

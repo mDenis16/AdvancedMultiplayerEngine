@@ -31,6 +31,9 @@
     <Filter Include="Shared\ClientCmd">
       <UniqueIdentifier>{565dc121-4b20-483f-98fa-10ec19490797}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Server\PacketHandler">
+      <UniqueIdentifier>{78ecd5f1-0e82-4851-85cf-0ba69bdbcfc5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Server.cpp">
@@ -54,6 +57,9 @@
     <ClCompile Include="main.cpp">
       <Filter>Server</Filter>
     </ClCompile>
+    <ClCompile Include="PacketHandler.cpp">
+      <Filter>Server\PacketHandler</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Shared\Entities\Player.hpp">
@@ -65,9 +71,6 @@
     <ClInclude Include="..\Shared\Entities\Ped.hpp">
       <Filter>Shared\Entities</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\Common.hpp">
-      <Filter>Shared</Filter>
-    </ClInclude>
     <ClInclude Include="Network.h">
       <Filter>Server\Network</Filter>
     </ClInclude>
@@ -76,12 +79,6 @@
     </ClInclude>
     <ClInclude Include="..\Shared\Entities\Entities.hpp">
       <Filter>Shared\Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\Shared.hpp">
-      <Filter>Shared</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\Definitions.h">
-      <Filter>Shared</Filter>
     </ClInclude>
     <ClInclude Include="Streamer.hpp">
       <Filter>Server\Streamer</Filter>
@@ -92,8 +89,11 @@
     <ClInclude Include="..\Shared\Network\NetworkDefinitions.hpp">
       <Filter>Shared\Network</Filter>
     </ClInclude>
-    <ClInclude Include="ClientCmd.hpp">
-      <Filter>Shared\ClientCmd</Filter>
+    <ClInclude Include="..\Shared\ClientCmd\ClientCmd.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketHandler.hpp">
+      <Filter>Server\PacketHandler</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

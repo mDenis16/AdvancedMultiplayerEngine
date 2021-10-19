@@ -13,9 +13,10 @@ public:
 
 	void Initialize(std::uint32_t port);
 
-	Network GameNetwork;
 
 	
 private:
 
 };
+
+inline Server server;
