@@ -19,9 +19,6 @@
     <Filter Include="Client\Network">
       <UniqueIdentifier>{b30005c8-cde2-484d-874b-cce727943947}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Client\Streamer">
-      <UniqueIdentifier>{c342930d-b85f-4be1-9d7b-0266e003aec2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Shared">
       <UniqueIdentifier>{5028d8b4-cf14-480d-bc19-1178130a687e}</UniqueIdentifier>
     </Filter>
@@ -33,6 +30,9 @@
     </Filter>
     <Filter Include="Shared\Network">
       <UniqueIdentifier>{7ed79312-7770-45e3-aa85-f049492928b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shared\Octree">
+      <UniqueIdentifier>{4b8dade5-bb53-43d7-bcc7-f5d563a21a9f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -78,6 +78,9 @@
     <ClInclude Include="..\Shared\ClientCmd\ClientCmd.hpp">
       <Filter>Shared\ClientCmd</Filter>
     </ClInclude>
+    <ClInclude Include="..\Shared\Octree\Octree.hpp">
+      <Filter>Shared\Octree</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -97,6 +100,9 @@
     </ClCompile>
     <ClCompile Include="..\Shared\Entities\Player.cpp">
       <Filter>Shared\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="Streamer.cpp">
+      <Filter>Client\Network</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -1,4 +1,9 @@
 #pragma once
+#include <enet/enet.h>
+
+#include "Gridmap/Grid.hpp"
+#include <mutex>
+
 
 enum class EntityType {
 	ET_None,
@@ -10,8 +15,17 @@ enum class EntityType {
 class Entity {
 public:
 
-	glm::vec3 Position;
+	GridCell<Entity*>* cell = nullptr;
 
+	bool operator == (Entity* const& e)
+	{
+		return (EntityHandle == e->EntityHandle);
+	}
+
+
+	glm::vec3 Position;
+	int oldCellIndex = 0;
+	int cellIndex = 0;
 	std::uint32_t EntityHandle = 0;
 #if CLIENT
 	std::uint32_t GameHandle = 0;
@@ -26,5 +40,13 @@ public:
 	bool IsNetworked = false;
 
 	bool IsStreamed = false;
+
+	std::mutex EntitiesInStreamRangeMutex;
+	std::vector<Entity*> EntitiesInStreamRange;
+	
+	
+
+	std::vector<unsigned char> Serialize();
+
 
 };

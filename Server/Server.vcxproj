@@ -78,7 +78,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>D:\repos\AdvancedMultiplayerEngine\Shared;$(VC_IncludePath);$(WindowsSDK_IncludePath);F:\includes\ENet\include;F:\includes\glm-master</IncludePath>
+    <IncludePath>D:\repos\AdvancedMultiplayerEngine\Shared;$(VC_IncludePath);$(WindowsSDK_IncludePath);F:\includes\ENet\include;F:\includes\glm-master;F:\includes\boost_1_73_0</IncludePath>
     <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);F:\includes\ENet;</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -118,11 +118,12 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;SERVER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;SERVER;MSGPACK_VEC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>Common.hpp</PrecompiledHeaderFile>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -152,12 +153,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Shared\Entities\Entity.cpp" />
     <ClCompile Include="..\Shared\Entities\Ped.cpp" />
     <ClCompile Include="..\Shared\Entities\Player.cpp" />
     <ClCompile Include="..\Shared\Network\NetworkPacket.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Network.cpp" />
     <ClCompile Include="PacketHandler.cpp" />
+    <ClCompile Include="ProcessCreateMove.cpp" />
     <ClCompile Include="Server.cpp" />
     <ClCompile Include="Streamer.cpp" />
   </ItemGroup>
@@ -167,6 +170,7 @@
     <ClInclude Include="..\Shared\Entities\Entity.hpp" />
     <ClInclude Include="..\Shared\Entities\Ped.hpp" />
     <ClInclude Include="..\Shared\Entities\Player.hpp" />
+    <ClInclude Include="..\Shared\Gridmap\Grid.hpp" />
     <ClInclude Include="..\Shared\Network\NetworkDefinitions.hpp" />
     <ClInclude Include="..\Shared\Network\NetworkPacket.hpp" />
     <ClInclude Include="Network.h" />

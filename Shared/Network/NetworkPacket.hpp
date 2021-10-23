@@ -1,14 +1,19 @@
 #pragma once
 
-enum  PacketFlags 
+enum  PacketFlags
 {
 	None = 0,
 	StreamEntireNetwork = 1,
+	StreamRangeNetwork = 2,
+	StreamRangeEntities = 3,
 };
 enum PacketType
 {
 	PlayerHandshake = 0,
 	PlayerJoin = 1,
+	EntitiesStreamIn = 2,
+	PlayerCreateMove = 3,
+	EntitiesStreamOut = 4
 };
 class NetworkPacket {
 public:
@@ -18,11 +23,18 @@ public:
 
 #if SERVER
 	/// <summary>
+	/// Used in streaming data to multiple entities
+	/// </summary>
+	/// <param name="peer"></param>
+	/// <param name="packet"></param>
+	NetworkPacket(int packetType, std::vector<Entity*> batch, int flags = 0, ENetPeer* except = nullptr);
+
+	/// <summary>
 	/// Used in streaming data to only one entity
 	/// </summary>
 	/// <param name="peer"></param>
 	/// <param name="packet"></param>
-	NetworkPacket(int packetType, ENetPeer* peer, ENetPacket* packet);
+	NetworkPacket(int packetType, ENetPeer* peer);
 
 	/// <summary>
 	/// Used in cases where we need flags
@@ -31,7 +43,7 @@ public:
 	/// <param name="peer"></param>
 	/// <param name="packet"></param>
 	/// <param name="flags"></param>
-	NetworkPacket(int packetType, ENetPeer* peer, ENetPacket* packet, int flags);
+	NetworkPacket(int packetType, ENetPeer* peer, int flags = 0);
 
 	/// <summary>
 	/// Used in case if we want to stream data over all entities
@@ -42,6 +54,7 @@ public:
 	NetworkPacket(int packetType,  int flags, ENetPeer* except = nullptr);
 
 
+	std::vector<Entity*> EntitiesBatch;
 
 
 

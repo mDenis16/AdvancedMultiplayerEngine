@@ -34,6 +34,9 @@
     <Filter Include="Server\PacketHandler">
       <UniqueIdentifier>{78ecd5f1-0e82-4851-85cf-0ba69bdbcfc5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shared\Grid">
+      <UniqueIdentifier>{6ca31d98-7baa-46c7-aaa4-c2fb0fa5be2e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Server.cpp">
@@ -59,6 +62,12 @@
     </ClCompile>
     <ClCompile Include="PacketHandler.cpp">
       <Filter>Server\PacketHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="ProcessCreateMove.cpp">
+      <Filter>Server\PacketHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Entities\Entity.cpp">
+      <Filter>Server</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -94,6 +103,9 @@
     </ClInclude>
     <ClInclude Include="PacketHandler.hpp">
       <Filter>Server\PacketHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Gridmap\Grid.hpp">
+      <Filter>Shared\Grid</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

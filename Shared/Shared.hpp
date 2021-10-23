@@ -9,6 +9,8 @@
 #include "Definitions.h"
 #include "Network\NetworkPacket.hpp"
 
+#include <unordered_map>
+
 // Our types and definitions
 typedef std::chrono::high_resolution_clock Clock;
 typedef Clock::time_point ClockTime;

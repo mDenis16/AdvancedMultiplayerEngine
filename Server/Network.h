@@ -1,4 +1,5 @@
 #pragma once
+#include "Streamer.hpp"
 
 
 class Network
@@ -32,6 +33,7 @@ public:
 	SAFE_PROP(std::vector<Player*>, Players);
 
 	
+	Streamer streamer;
 
 
 	ENetHost* HostListener = nullptr;

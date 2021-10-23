@@ -4,8 +4,11 @@
 #include <iostream>
 #include <glm\glm.hpp>
 
+#include "pch.h"
 
-Camera camera = { 0 };
+#include <Client/Network.hpp>
+#include <Client/Client.hpp>
+#include "Multiplayer.hpp"
 
 void SceneView::Init()
 {
@@ -29,60 +32,90 @@ void SceneView::OnRender()
 {
 	//--------------------------------------------------------------------------------------
 
+    
+    const int screenWidth = 500;
+    const int screenHeight = 500;
+    glm::vec3 gtaMins = glm::vec3(-5395.54, -5024.13, 0);
+    glm::vec3 gtaMaxs = glm::vec3(5395.54, 9024.13, 0);
 
-    const int screenWidth = 1280;
-    const int screenHeight = 720;
+    auto center = (gtaMins + gtaMaxs) * 0.5f;
 
     InitWindow(screenWidth, screenHeight, "raylib [core] example - 3d camera first person");
 
     // Define the camera to look into our 3d world (position, target, up vector)
-    Camera camera = { 0 };
-    camera.position = Vector3{ 4.0f, 2.0f, 4.0f };
+    Camera3D camera = { 0 };
+  
+    camera.position = Vector3{ -350.0f, 120.0f, 100.0f };
     camera.target = Vector3{ 0.0f, 1.8f, 0.0f };
     camera.up = Vector3{ 0.0f, 1.0f, 0.0f };
-    camera.fovy = 60.0f;
+    camera.fovy = 65.0f;
     camera.projection = CAMERA_PERSPECTIVE;
 
- 
-    SetCameraMode(camera, CAMERA_FIRST_PERSON); // Set a first person camera mode
+    //auto gridvIew = new Grid<int>(glm::vec3(-250, -250, 0), glm::vec3(250, 250, 0), glm::vec3(30, 30, 0));
+
+    SetCameraMode(camera, CAMERA_FREE); // Set a first person camera mode
 
     SetTargetFPS(60);                           // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
-
+    
     // Main game loop
     while (!WindowShouldClose())                // Detect window close button or ESC key
     {
-        // Update
-        //----------------------------------------------------------------------------------
-        UpdateCamera(&camera);                  // Update camera
-        //----------------------------------------------------------------------------------
 
-        // Draw
-        //----------------------------------------------------------------------------------
+        
+
+
+        UpdateCamera(&camera);                  // Update camera
+   
         BeginDrawing();
 
-        ClearBackground(RAYWHITE);
+        ClearBackground(WHITE);
 
         BeginMode3D(camera);
 
-        DrawPlane(Vector3 { 0.0f, 0.0f, 0.0f }, Vector2 { 32.0f, 32.0f }, LIGHTGRAY); // Draw ground
-        DrawCube(Vector3 { -16.0f, 2.5f, 0.0f }, 1.0f, 5.0f, 32.0f, BLUE);     // Draw a blue wall
-        DrawCube(Vector3 { 16.0f, 2.5f, 0.0f }, 1.0f, 5.0f, 32.0f, LIME);      // Draw a green wall
-        DrawCube(Vector3 { 0.0f, 2.5f, 16.0f }, 32.0f, 5.0f, 1.0f, GOLD);      // Draw a yellow wall
+  
+         if (IsKeyDown(KEY_RIGHT)) localPosition.y += 3.0f;
+         if (IsKeyDown(KEY_LEFT)) localPosition.y -= 3.0f;
+         if (IsKeyDown(KEY_UP)) localPosition.x += 3.0f;
+         if (IsKeyDown(KEY_DOWN)) localPosition.x -= 3.0f;
 
-        DrawCube(Vector3{ camera.target.x,camera.target.y - 2,camera.target.z }, 2.0f, 2.0f, 2.f, RED);
 
+         std::clamp(localPosition.x, Multiplayer.grid->_min.x, Multiplayer.grid->_max.x);
+         std::clamp(localPosition.z, Multiplayer.grid->_min.y, Multiplayer.grid->_max.y);
+
+        DrawPlane( Vector3 { 0, 0, 0 }, Vector2 { 500, 500 }, BLUE);
+        for (auto& cell : Multiplayer.grid->cells) {
+            auto center = (cell.mins + cell.maxs) * 0.5f;
+            DrawLine3D(Vector3{ cell.mins.x, 0, cell.mins.y }, Vector3{ cell.maxs.x, 0, cell.mins.y }, RED);
+            DrawLine3D(Vector3{ cell.mins.x, 0, cell.mins.y }, Vector3{ cell.mins.x, 0, cell.maxs.y }, GREEN);
      
+         //   RLAPI void DrawSphereEx(Vector3 centerPos, float radius, int rings, int slices, Color color);            // Draw sphere with extended parameters
+
+            //DrawSphereEx(Vector3{ center.x, center.z, center.y }, 5.f, 5, 5, RED);
+           
+         
+
+           
+            
+        }
+        
+        DrawSphere(Vector3{ localPosition.x, localPosition.z, localPosition.y }, 5.f, MAGENTA);
 
         EndMode3D();
+        localCell = Multiplayer.grid->getCell(glm::vec3(localPosition.x, localPosition.y, localPosition.z));
 
-        DrawRectangle(10, 10, 220, 70, Fade(SKYBLUE, 0.5f));
-        DrawRectangleLines(10, 10, 220, 70, BLUE);
+        if (localCell) {
+            auto nearby = Multiplayer.grid->getNearby(localCell);
+            for (auto& cell : nearby) {
+                auto center = (cell->mins + cell->maxs) * 0.5f;
 
-       // DrawText("First person camera default controls:", 20, 20, 10, BLACK);
-       // DrawText("- Move with keys: W, A, S, D", 40, 40, 10, DARKGRAY);
-        //DrawText("- Mouse move to look around", 40, 60, 10, DARKGRAY);
+                auto pos = GetWorldToScreen(Vector3{ center.x, 0, center.y }, camera);
 
+                DrawRayText(std::to_string(cell->_index).c_str(), pos.x, pos.y, 10, BLACK);
+            }
+        }
+
+        Multiplayer.OnCreateMove();
         EndDrawing();
         //----------------------------------------------------------------------------------
     }

@@ -167,6 +167,7 @@
     <ClInclude Include="..\Shared\Entities\Player.hpp" />
     <ClInclude Include="..\Shared\Network\NetworkDefinitions.hpp" />
     <ClInclude Include="..\Shared\Network\NetworkPacket.hpp" />
+    <ClInclude Include="..\Shared\Octree\Octree.hpp" />
     <ClInclude Include="..\Shared\Shared.hpp" />
     <ClInclude Include="Client.hpp" />
     <ClInclude Include="framework.h" />
@@ -185,6 +186,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Streamer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

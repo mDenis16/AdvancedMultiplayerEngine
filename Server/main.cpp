@@ -10,6 +10,7 @@ int main() {
 
 	while(true)
 	{
-		
+		Sleep(100000);
+
 	}
 }
