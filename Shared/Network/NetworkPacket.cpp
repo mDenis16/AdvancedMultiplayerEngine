@@ -17,42 +17,65 @@
 #undef min
 
 #if SERVER
-NetworkPacket::NetworkPacket(int packetType, std::vector<Entity*> batch, int flags , ENetPeer* except)
+/// <summary>
+/// Send packet to batch of entities
+/// </summary>
+/// <param name="packetType"></param>
+/// <param name="batch"></param>
+/// <param name="Packetflags"></param>
+/// <param name="except"></param>
+/// <param name="Reliable"></param>
+NetworkPacket::NetworkPacket(int packetType, std::vector<Entity*> batch, int Packetflags , ENetPeer* except, bool Reliable )
 {
-	//Reliable = (packet->flags & ENET_PACKET_FLAG_RELIABLE) != 0;
-	Flags = flags;
-	Flags |= StreamRangeEntities;
+	
 	Outgoing = true;
 	Type = packetType;
 	EntitiesBatch = batch;
 	ExceptPeer = except;
 	TargetPeer = nullptr;
+
+	this->PacketFlags |= StreamRangeEntities;
+
 	Write(Type);
 }
 
-NetworkPacket::NetworkPacket(int packetType, int flags, ENetPeer* except)
+/// <summary>
+	/// Send packet to one peer or entire network
+	///	Warning! When peer is nullptr it streams entire network
+	/// </summary>
+	/// <param name="packetType"></param>
+	/// <param name="peer"></param>
+	/// <param name="Packetflags"></param>
+	/// <param name="except"></param>
+	/// <param name="Reliable"></param>
+NetworkPacket::NetworkPacket(int packetType, ENetPeer* peer, bool Reliable, int Packetflags, ENetPeer* except)
 {
-	//Reliable = (packet->flags & ENET_PACKET_FLAG_RELIABLE) != 0;
-	Flags = flags;
+	this->Reliable = Reliable;
+	this->PacketFlags = Packetflags;
 	Outgoing = true;
 	Type = packetType;
 	ExceptPeer = except;
-	TargetPeer = nullptr;
+	TargetPeer = peer;
+
+	if (peer == nullptr)
+		this->PacketFlags |= StreamEntireNetwork;
+
 	Write(Type);
 }
 
-NetworkPacket::NetworkPacket(int packetType, ENetPeer* peer, int flags)
+
+#endif
+#if CLIENT
+NetworkPacket::NetworkPacket(int packetType, bool Reliable)
 {
-	Flags = flags;
-	flags |= ENET_PACKET_FLAG_RELIABLE;
+	if (Reliable)
+	   NetworkFlags |= ENET_PACKET_FLAG_RELIABLE;
+
 	Outgoing = true;
 	Type = packetType;
-
-	TargetPeer = peer;
 	Write(Type);
 }
 #endif
-
 NetworkPacket::NetworkPacket(ENetPeer* peer, ENetPacket* packet)
 {
 	Reliable = (packet->flags & ENET_PACKET_FLAG_RELIABLE) != 0;
@@ -65,14 +88,6 @@ NetworkPacket::NetworkPacket(ENetPeer* peer, ENetPacket* packet)
 	if (packet->data)
 	   Read(Type);
 
-}
-
-NetworkPacket::NetworkPacket(int packetType, int flags)
-{
-	Flags = flags;
-	Outgoing = true;
-	Type = packetType;
-	Write(Type);
 }
 
 
@@ -106,7 +121,7 @@ void NetworkPacket::Send()
 	}
 #endif
 
-	Flags |= ENET_PACKET_FLAG_NO_ALLOCATE;
+	//Flags |= ENET_PACKET_FLAG_NO_ALLOCATE;
 }
 
 

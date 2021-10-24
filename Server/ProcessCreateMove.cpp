@@ -33,7 +33,7 @@ void PacketHandler::ProcessMovement(Player* player, NetworkPacket* packet)
 		auto& newCell = GameNetwork.streamer.grid->cells[cmd.cellIndex];
 		newCell.Items.push_back(player);
 
-
+		player->oldCellIndex = player->cellIndex;
 		player->cellIndex = cmd.cellIndex;
 		
 		GameNetwork.streamer.UpdateStream(player);

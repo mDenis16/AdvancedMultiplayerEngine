@@ -27,12 +27,12 @@ void MultiplayerNetwork::HandlePacket(NetworkPacket* packet)
 
 void MultiplayerNetwork::EntityStreamIn(Entity* ent)
 {
-	std::cout << "Ent stream in" << std::endl;
+	//std::cout << "Ent stream in" << std::endl;
 }
 
 void MultiplayerNetwork::EntityStreamOut(Entity* ent)
 {
-	std::cout << "Ent stream out " << std::endl;
+	//std::cout << "Ent stream out " << std::endl;
 }
 
 /// <summary>

@@ -66,7 +66,7 @@ void Network::HandleFlow() {
 				Connected = false;
 			}
 			else if (ev.type == ENET_EVENT_TYPE_RECEIVE) {
-				std::cout << "Client received packet" << std::endl;
+				//std::cout << "Client received packet" << std::endl;
  				SAFE_MODIFY(IncomingPackets);
 
 				NetworkPacket* receivedPacket = new NetworkPacket(ev.peer, ev.packet);
@@ -145,7 +145,7 @@ void Network::HandleOutgoingFlow()
 			OutgoingPackets.pop();
 
 		
-			ENetPacket* newPacket = enet_packet_create(message->mData, message->Lenght, message->Flags);
+			ENetPacket* newPacket = enet_packet_create(message->mData, message->Lenght, message->PacketFlags);
 			newPacket->userData = message;
 			newPacket->freeCallback = OnNetworkReleaseMessage;
 			enet_peer_send(Peer, 0, newPacket);

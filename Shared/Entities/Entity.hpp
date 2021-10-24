@@ -21,7 +21,11 @@ public:
 	{
 		return (EntityHandle == e->EntityHandle);
 	}
-
+	
+	bool operator == (std::uint32_t eHandle)
+	{
+		return (EntityHandle == eHandle);
+	}
 
 	glm::vec3 Position;
 	int oldCellIndex = 0;

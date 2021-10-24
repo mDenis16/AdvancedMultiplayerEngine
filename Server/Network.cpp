@@ -24,7 +24,7 @@ void Network::OnClientConnect(ENetPeer* peer)
 	SAFE_READ(Players);
 	Players.push_back(newPlayer);
 
-	auto packet = new NetworkPacket(PacketType::PlayerJoin, PacketFlags::StreamEntireNetwork, peer);
+	auto packet = new NetworkPacket(PacketType::PlayerJoin, nullptr, true, 0, peer);
 
 	packet->Write(newPlayer->EntityHandle);
 
@@ -58,14 +58,14 @@ void Network::HandleOutgoingFlow()
 			newPacket->userData = message;
 			newPacket->freeCallback = OnNetworkReleaseMessage;
 
-			if (message->Flags & PacketFlags::StreamEntireNetwork)
+			if (message->PacketFlags & PacketFlags::StreamEntireNetwork)
 			{
 				SAFE_READ(Players);
 				for (auto player : Players)
 					if (player->Peer != message->ExceptPeer) {
 						enet_peer_send(player->Peer, 0, newPacket);
 					}
-			}else if (message->Flags & StreamRangeNetwork)
+			}/*else if (message->PacketFlags & StreamRangeNetwork)
 			{
 				auto player = (Player*)message->TargetPeer->data;
 				if (player) {
@@ -77,8 +77,8 @@ void Network::HandleOutgoingFlow()
 					}
 						
 				}
-			}
-			else if (message->Flags & StreamRangeEntities)
+			}*/
+			else if (message->PacketFlags & StreamRangeEntities)
 			{
 				
 				for (auto batch : message->EntitiesBatch) {

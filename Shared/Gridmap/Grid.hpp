@@ -76,7 +76,7 @@ public:
 
 		return refs;
 	}
-	bool isNearby(GridCell<T>* cell) {
+	bool isNearby(GridCell<T>* cell, GridCell<T>* cellTarget) {
 		
 		std::vector<int> numbers;
 		numbers.reserve(9);
@@ -97,7 +97,7 @@ public:
 			}
 		}
 
-		return std::find(numbers.begin(), numbers.end(), cell->_index) != numbers.end();
+		return std::find(numbers.begin(), numbers.end(), cellTarget->_index) != numbers.end();
 	}
 	GridCell<T>* getCell(glm::vec3 position) {
 

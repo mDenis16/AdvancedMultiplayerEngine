@@ -40,6 +40,8 @@ public:
 
 	SAFE_PROP(std::unordered_map <std::uint32_t COMMA Entity*>, Entities);
 
+	std::mutex streamLock;
+	std::vector<Entity*> RenderedEntities;
 	std::vector<Entity*> StreamedEntities;
 	std::atomic<bool> Connected{ false };
 

@@ -7,23 +7,41 @@
 
 void Network::ProcessStreamOut(NetworkPacket* packet)
 {
-	std::cout << "Process stream out entities." << std::endl;
 
 	uint32_t numEntities;
 	packet->Read(numEntities);
 
-
-
-
 	for (uint32_t i = 0; i < numEntities; i++) {
 
-		Entity Serialized;
+		std::uint32_t EntityHandle;
 
-		packet->Read(Serialized.EntityHandle);
+		packet->Read(EntityHandle);
 	
+		{
+			
+			std::lock_guard<std::mutex> guard(streamLock);
 
+			{
+				auto idx = std::find_if(RenderedEntities.begin(), RenderedEntities.end(), [EntityHandle](Entity* s) {
+					return s->EntityHandle == EntityHandle;
+					});
+				if (idx != RenderedEntities.end())
+					RenderedEntities.erase(idx);
+			}
 
-		std::cout << "Stream OUT in entity handle " << (int)Serialized.EntityHandle << std::endl;
+			{
+				auto idx = std::find_if(StreamedEntities.begin(), StreamedEntities.end(), [EntityHandle](Entity* s) {
+					return s->EntityHandle == EntityHandle;
+					});
+				if (idx != StreamedEntities.end()) {
+					EntityStreamOut(*idx);
+					StreamedEntities.erase(idx);
+				}
+			}
+
+		}
+
+		std::cout << "Stream OUT in entity handle " << (int)EntityHandle << std::endl;
 
 
 	}
@@ -31,7 +49,7 @@ void Network::ProcessStreamOut(NetworkPacket* packet)
 }
 void Network::ProcessStream(NetworkPacket* packet)
 {
-	std::cout << "Process stream in entities." << std::endl;
+	
 
 	uint32_t numEntities;
 	packet->Read(numEntities);
@@ -53,8 +71,12 @@ void Network::ProcessStream(NetworkPacket* packet)
 		if (Serialized.Type == EntityType::ET_Player)
 		{
 			auto player = new Player(Serialized);
+			{
+				std::lock_guard<std::mutex> guard(streamLock);
+				StreamedEntities.push_back(player);
+				RenderedEntities.push_back(player);
+			}
 
-			StreamedEntities.push_back(player);
 			EntityStreamIn(player);
 		}
 	

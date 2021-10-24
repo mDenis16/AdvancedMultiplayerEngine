@@ -2,10 +2,9 @@
 
 enum  PacketFlags
 {
-	None = 0,
-	StreamEntireNetwork = 1,
-	StreamRangeNetwork = 2,
-	StreamRangeEntities = 3,
+	None = 1 << 0,
+	StreamEntireNetwork = 1 << 1,
+	StreamRangeEntities = 1 << 2,
 };
 enum PacketType
 {
@@ -23,35 +22,27 @@ public:
 
 #if SERVER
 	/// <summary>
-	/// Used in streaming data to multiple entities
-	/// </summary>
-	/// <param name="peer"></param>
-	/// <param name="packet"></param>
-	NetworkPacket(int packetType, std::vector<Entity*> batch, int flags = 0, ENetPeer* except = nullptr);
+/// Send packet to batch of entities
+/// </summary>
+/// <param name="packetType"></param>
+/// <param name="batch"></param>
+/// <param name="Packetflags"></param>
+/// <param name="except"></param>
+/// <param name="Reliable"></param>
+	NetworkPacket(int packetType, std::vector<Entity*> batch, int Packetflags = 0, ENetPeer* except = nullptr, bool Reliable = false);
 
 	/// <summary>
-	/// Used in streaming data to only one entity
+	/// Send packet to one peer or entire network
+	///	Warning! When peer is nullptr it streams entire network
 	/// </summary>
+	/// <param name="packetType"></param>
 	/// <param name="peer"></param>
-	/// <param name="packet"></param>
-	NetworkPacket(int packetType, ENetPeer* peer);
+	/// <param name="Packetflags"></param>
+	/// <param name="except"></param>
+	/// <param name="Reliable"></param>
+	NetworkPacket(int packetType, ENetPeer* peer = nullptr, bool Reliable = false, int Packetflags = 0, ENetPeer* except = nullptr);
 
-	/// <summary>
-	/// Used in cases where we need flags
-	///	like reliable udp packet or compressed packet
-	/// </summary>
-	/// <param name="peer"></param>
-	/// <param name="packet"></param>
-	/// <param name="flags"></param>
-	NetworkPacket(int packetType, ENetPeer* peer, int flags = 0);
 
-	/// <summary>
-	/// Used in case if we want to stream data over all entities
-	///	Except -> nullptr in case we need to skip one player
-	/// </summary>
-	/// <param name="packet"></param>
-	/// <param name="flags"></param>
-	NetworkPacket(int packetType,  int flags, ENetPeer* except = nullptr);
 
 
 	std::vector<Entity*> EntitiesBatch;
@@ -70,7 +61,7 @@ public:
 	/// <param name="packet"></param>
 	NetworkPacket(ENetPeer* peer, ENetPacket* packet);
 
-	NetworkPacket(int packetType, int flags);
+	NetworkPacket(int packetType, bool Reliable = false);
 
 	uint8_t* mData;                         /**< Data building up. */
 	unsigned int mPos;                   /**< Position in the data. */
@@ -80,7 +71,9 @@ public:
 	bool Outgoing = false;
 	bool Executed = false;
 
-    int Flags = 0;
+    int PacketFlags = 0;
+	int NetworkFlags = 0;
+
 	int Type = -1;
 
 	size_t Current = 0;
