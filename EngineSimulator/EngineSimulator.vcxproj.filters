@@ -19,6 +19,9 @@
     <Filter Include="Multiplayer">
       <UniqueIdentifier>{897e41b3-3b3f-4415-8bf7-30acbf23932a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Multiplayer\Implementations">
+      <UniqueIdentifier>{b7992dbf-6e3e-4471-b401-d57e0a7231bf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="EngineSimulator.cpp">
@@ -30,6 +33,9 @@
     <ClCompile Include="Multiplayer.cpp">
       <Filter>Multiplayer</Filter>
     </ClCompile>
+    <ClCompile Include="Ped.cpp">
+      <Filter>Multiplayer\Implementations</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SceneView.hpp">
@@ -40,6 +46,9 @@
     </ClInclude>
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Implementations.hpp">
+      <Filter>Multiplayer\Implementations</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

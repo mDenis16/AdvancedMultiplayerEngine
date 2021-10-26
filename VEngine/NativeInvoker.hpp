@@ -96,7 +96,19 @@ public:
 	NativeRegistration** registrationTable;
 	std::unordered_map<uint64_t, RAGE::ScrNativeHandler> foundHashCache;
 	
-	
+	inline void SetVectorResults()
+	{
+		/*for (size_t i = 0; i < m_nDataCount; i++)
+		{
+			auto outVector = m_vectorSpace.outVectors[i];
+			const auto& inVector = m_vectorSpace.inVectors[i];
+
+			outVector->x = inVector.x;
+			outVector->y = inVector.y;
+			outVector->z = inVector.z;
+		}*/
+	}
+
 
 private:
 	NativeCallContext CallContext;

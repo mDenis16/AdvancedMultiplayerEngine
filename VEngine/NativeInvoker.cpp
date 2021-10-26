@@ -90,8 +90,11 @@ void CNativeInvoker::EndCall(RAGE::ScrNativeHash hash)
 	{
 		RAGE::ScrNativeHandler handler = it->second;
 
-		handler(&CallContext);
-		Functions::m_fix_vectors(&CallContext);
+		if (handler) {
+			handler(&CallContext);
+
+			Functions::m_fix_vectors(&CallContext);
+		}
 	}
 	else
 	{

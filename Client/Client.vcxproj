@@ -158,7 +158,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\Shared\ClientCmd\ClientCmd.hpp" />
+    <ClInclude Include="..\Shared\ClientCmd\LagRecord.hpp" />
     <ClInclude Include="..\Shared\Common.hpp" />
     <ClInclude Include="..\Shared\Definitions.h" />
     <ClInclude Include="..\Shared\Entities\Entities.hpp" />
@@ -175,6 +175,7 @@
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Shared\Entities\Entity.cpp" />
     <ClCompile Include="..\Shared\Entities\Ped.cpp" />
     <ClCompile Include="..\Shared\Entities\Player.cpp" />
     <ClCompile Include="..\Shared\Network\NetworkPacket.cpp" />

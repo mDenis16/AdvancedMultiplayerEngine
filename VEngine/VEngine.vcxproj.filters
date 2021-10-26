@@ -111,6 +111,12 @@
     <ClInclude Include="NativeThreadsafeExecutor.hpp">
       <Filter>Engine</Filter>
     </ClInclude>
+    <ClInclude Include="Implementations.hpp">
+      <Filter>Multiplayer</Filter>
+    </ClInclude>
+    <ClInclude Include="Script.hpp">
+      <Filter>Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -150,6 +156,12 @@
       <Filter>Multiplayer</Filter>
     </ClCompile>
     <ClCompile Include="NativeThreadsafeExecutor.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Ped.cpp">
+      <Filter>Multiplayer</Filter>
+    </ClCompile>
+    <ClCompile Include="Script.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
   </ItemGroup>

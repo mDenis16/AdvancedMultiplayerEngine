@@ -4,10 +4,7 @@
 #include <queue>
 #include <mutex>
 
-#include <enet\enet.h>
-#include "Entities\Entities.hpp"
-#include "Definitions.h"
-#include "Network\NetworkPacket.hpp"
+
 
 #include <unordered_map>
 
@@ -44,3 +41,11 @@ poolname##MutexCond.notify_one();
 poolname##MutexCondFlag = false; 
 
 #define COMMA ,
+
+#include <glm/glm.hpp>
+#include <enet\enet.h>
+#include "Definitions.h"
+#include "ClientCmd\LagRecord.hpp"
+#include "Network\NetworkPacket.hpp"
+#include "Entities\Entities.hpp"
+

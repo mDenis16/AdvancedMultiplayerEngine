@@ -3,7 +3,7 @@
 
 class MultiplayerNetwork : public Network {
 public:
-	
+
 
 	void EventDisconnect() override;
 	void EventConnect() override;
@@ -11,7 +11,7 @@ public:
 
 	void EntityStreamIn(Entity* ent) override;
 	void EntityStreamOut(Entity* ent) override;
-
+	void OnEntityCreateMove(Entity* entity) override;
 	void OnCreateMove();
 
 	ClockTime lastCreateMove;

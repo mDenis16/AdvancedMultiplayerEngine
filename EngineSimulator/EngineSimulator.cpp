@@ -16,14 +16,20 @@
 
 int main()
 {
+    Multiplayer.Initialize();
 
-     Multiplayer.Connect("192.168.88.252", 5555);
+    std::cout << "Enter server ip: " << std::endl;
+
+    std::string ip;
+    std::cin >> ip;
+
+     Multiplayer.Connect(ip.c_str(), 22005);
 
 
      scene.Init();
 
      while (true) {
-
+         Sleep(10000);
      }
 
      std::cout << "Hello World!\n";

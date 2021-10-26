@@ -5,7 +5,7 @@
 
 #include "Network.hpp"
 
-Network::Network()
+void Network::Initialize()
 {	
 	std::cout << "Network construct called " << std::endl;
 
@@ -17,7 +17,7 @@ Network::Network()
 
 	Local = enet_host_create(nullptr, 1, 1, 0, 0);
 
-	Connected = true;
+	Running = true;
 
 	THREAD_START(HandleIncomingFlow, std::bind(&Network::HandleIncomingFlow, this));
 	THREAD_START(HandleOutgoingFlow, std::bind(&Network::HandleOutgoingFlow, this));
@@ -29,13 +29,21 @@ Network::Network()
 	glm::vec3 gtaMaxs = glm::vec3(5395.54, 9024.13, 0);
 	grid = new Grid<Entity*>(gtaMins, gtaMaxs, glm::vec3(distance / 3, distance / 3, 0));
 
-}
-Network::~Network()
-{
-	Connected = false;
 
+}
+void Network::Destroy()
+{
+	Running = false;
+	THREAD_WAKE(HandleIncomingFlow)
+	THREAD_WAKE(HandleOutgoingFlow)
+
+	
 	if (Peer)
 		Disconnect();
+	Connected = false;
+	
+
+
 
 
 	if (Local) {
@@ -48,8 +56,9 @@ Network::~Network()
 
 void Network::HandleFlow() {
 
-	while (Connected) {
+	while (Running) {
 		
+
 		ENetEvent ev;
 		bool NeedWake = false;
 		while (enet_host_service(Local, &ev, 0) > 0)
@@ -61,9 +70,8 @@ void Network::HandleFlow() {
 			}
 			else if (ev.type == ENET_EVENT_TYPE_DISCONNECT)
 			{
+				Disconnect();
 				std::cout << "Disconnected " << std::endl;
-				Peer = nullptr;
-				Connected = false;
 			}
 			else if (ev.type == ENET_EVENT_TYPE_RECEIVE) {
 				//std::cout << "Client received packet" << std::endl;
@@ -78,13 +86,15 @@ void Network::HandleFlow() {
 		if (NeedWake)
 			THREAD_WAKE(HandleIncomingFlow);
 
+		Sleep(1000 / 60);
 	}
+	std::cout << "HandleFlow stopped " << std::endl;
 	
 }
 void Network::HandleIncomingFlow()
 {
 
-	while (Connected) {
+	while (Running) {
 		
 		THREAD_WAIT(HandleIncomingFlow)
 		SAFE_MODIFY(IncomingPackets)
@@ -96,7 +106,7 @@ void Network::HandleIncomingFlow()
 			message->MarkAsExecuted();
 
 			//std::cout << "Handle incmming packet type " << message->Type << std::endl;
-
+			
 			if (message->Type == PlayerJoin) {
 
 				std::cout << "Player joined" << std::endl;
@@ -105,9 +115,31 @@ void Network::HandleIncomingFlow()
 
 				message->Read(Handle);
 
-				Entities[Handle] = new Player(Handle);
+			//	Entities[Handle] = new Player(Handle);
 
 			}
+			else if (message->Type == PlayerCreateMove)
+			{
+				std::uint32_t Handle;
+				
+				message->Read(Handle);
+
+			
+				{
+					std::lock_guard<std::mutex> guard(streamLock);
+
+					auto it = std::find_if(StreamedEntities.begin(), StreamedEntities.end(), [Handle](Entity* s) {
+						return s->EntityHandle == Handle;
+						});
+					if (it != StreamedEntities.end()) {
+						//std::cout << "Received CreateMove from handle " << Handle << std::endl;
+
+						(*it)->CreateMove(message);
+
+
+					}
+				}
+			} 
 			else if (message->Type == EntitiesStreamIn)
 			{
 				
@@ -129,14 +161,15 @@ void Network::HandleIncomingFlow()
 
 		THREAD_SLEEP(HandleIncomingFlow);
 	}
-	
+	std::cout << "HandleIncomingFlow stopped " << std::endl;
 }
 
 
 void Network::HandleOutgoingFlow()
 {
-	while (Connected) {
+	while (Running) {
 		
+
 		THREAD_WAIT(HandleOutgoingFlow)
 		SAFE_MODIFY(OutgoingPackets);
 
@@ -145,7 +178,7 @@ void Network::HandleOutgoingFlow()
 			OutgoingPackets.pop();
 
 		
-			ENetPacket* newPacket = enet_packet_create(message->mData, message->Lenght, message->PacketFlags);
+			ENetPacket* newPacket = enet_packet_create(message->mData, message->Lenght, ENET_PACKET_FLAG_RELIABLE | ENET_PACKET_FLAG_NO_ALLOCATE);
 			newPacket->userData = message;
 			newPacket->freeCallback = OnNetworkReleaseMessage;
 			enet_peer_send(Peer, 0, newPacket);
@@ -154,6 +187,7 @@ void Network::HandleOutgoingFlow()
 
 		THREAD_SLEEP(HandleOutgoingFlow);
 	}
+	std::cout << "HandleOutgoingFlow stopped " << std::endl;
 }
 void Network::SendHandshake()
 {
@@ -164,6 +198,7 @@ void Network::SendHandshake()
 }
 void Network::Connect(std::string hostname, std::uint16_t port)
 {
+	
 	if (Local == nullptr || Peer != nullptr) {
 		return;
 	}
@@ -172,10 +207,14 @@ void Network::Connect(std::string hostname, std::uint16_t port)
 	enet_address_set_host(&addr, hostname.c_str());
 	addr.port = port;
 	Peer = enet_host_connect(Local, &addr, 1, 0);
-
-	Connected = true;
+	if (Peer) {
+		std::cout << "Connected to host " << std::endl;
+	}
 }
-
+void Network::EntityCM(Entity* ent)
+{
+	OnEntityCreateMove(ent);
+}
 void Network::Disconnect()
 {
 	if (!Peer) return;
@@ -184,18 +223,18 @@ void Network::Disconnect()
 	std::cout << "Disconnnecting from " << Peer->address.host << std::endl;
 
 	enet_peer_disconnect(Peer, 0);
+	Connected = false;
+	Running = false;
 	Peer = nullptr;
 }
 
-void Network::NetworkCreateMove(ClientCmd& cmd)
+void Network::NetworkCreateLagRecord(LagRecord& cmd)
 {
 
 	auto movePacket = new NetworkPacket(PlayerCreateMove, 0);
 
-	movePacket->Write(cmd.Position);
-	movePacket->Write(cmd.Rotation);
-	movePacket->Write(cmd.Direction);
-	movePacket->Write(cmd.cellIndex);
+	movePacket->Write< LagRecord>(cmd);
+
 
 	movePacket->Send();
 }

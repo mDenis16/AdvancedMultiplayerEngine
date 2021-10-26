@@ -19,7 +19,7 @@ void Streamer::Init(int threads, int distance)
 
 	THREAD_START(HandleEntityStream, std::bind(&Streamer::HandleEntityStream, this));
 }
-void Streamer::UpdateStream(Player* player)
+void Streamer::UpdateStream(Entity* player)
 {
 	if (GameNetwork.streamer.grid == nullptr) return;
 
@@ -41,7 +41,7 @@ void Streamer::HandleEntityStream()
 		THREAD_WAIT(HandleEntityStream)
 			SAFE_MODIFY(EntityStreamQueue);
 		while (EntityStreamQueue.size() > 0) {
-			Player* player = EntityStreamQueue.front();
+			Entity* player = EntityStreamQueue.front();
 			EntityStreamQueue.pop();
 
 
@@ -63,10 +63,13 @@ void Streamer::HandleEntityStream()
 						if (itx == player->EntitiesInStreamRange.end()) {
 							std::cout << "ENTITY " << entity->EntityHandle << " is NOW STREAMED for " << player->EntityHandle << std::endl;
 							std::cout << "ENTITY " << player->EntityHandle << " is NOW STREAMED for " << entity->EntityHandle << std::endl;
+
+							
 							entity->EntitiesInStreamRange.push_back(player);
 							player->EntitiesInStreamRange.push_back(entity);
-							if (entity->EntityHandle != player->EntityHandle)
+							
 							streamIn.push_back(entity);
+
 						}
 					}
 
@@ -75,7 +78,12 @@ void Streamer::HandleEntityStream()
 
 
 					auto entity = player->EntitiesInStreamRange.at(i);
-					if (entity->EntityHandle == player->EntityHandle) continue;
+					if (entity->EntityHandle == player->EntityHandle)
+					{
+						player->EntitiesInStreamRange.erase(player->EntitiesInStreamRange.begin() + i);
+						std::cout << "BUG DELETED STREMED PLAYER TO OWN!!!" << std::endl;
+						continue;
+					};
 
 					auto entCell = &grid->cells[entity->cellIndex];
 
@@ -134,22 +142,17 @@ void Streamer::HandleEntityStream()
 					auto packetToStreamed = new NetworkPacket(EntitiesStreamOut, streamOut, StreamRangeEntities);
 					packetToStreamed->Write((std::uint32_t)1);
 					packetToStreamed->Write(player->EntityHandle);
-					packetToStreamed->Write(player->Type);
-					packetToStreamed->Write(player->Position);
 
 					packetToStreamed->Send();
 
-					/// <summary>
+				
 				/// Tell player streamed entities
 				/// </summary>
 					auto packetToPlayer = new NetworkPacket(EntitiesStreamOut, player->Peer, true);
 					packetToPlayer->Write((std::uint32_t)streamOut.size());
 					for (auto& ent : streamOut)
-					{
 						packetToPlayer->Write(ent->EntityHandle);
-						packetToPlayer->Write(ent->Type);
-						packetToPlayer->Write(ent->Position);
-					}
+					
 
 					packetToPlayer->Send();
 				}

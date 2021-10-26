@@ -18,11 +18,13 @@ void PacketHandler::Process(Player* player, NetworkPacket* packet)
 		packet->Write(999);
 
 		packet->Send();
+
+		GameNetwork.streamer.UpdateStream(player);
 	}
 		break;
 	case PlayerCreateMove:
 	{
-		ProcessMovement(player, packet);
+		player->CreateMove(packet);
 		
 	}
 	break;

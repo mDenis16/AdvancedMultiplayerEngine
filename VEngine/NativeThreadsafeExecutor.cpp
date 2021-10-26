@@ -6,18 +6,21 @@
 void NativeThreadSafe::ExecuteNativeQueue()
 {
 	try {
-		std::unique_lock<std::mutex> lock(QueueJobMutex);
-		while (QueueJobs.size() > 0) {
+		if (QueueJobMutex.try_lock()) {
+			while (QueueJobs.size() > 0) {
 
-			std::cout << "Executed task" << std::endl;
+				std::cout << "Executed task" << std::endl;
 
-			auto job = QueueJobs.front();
-			QueueJobs.pop();
+				auto job = QueueJobs.front();
+				QueueJobs.pop();
 
-			job->FunctionExecute();
-			std::unique_lock<std::mutex> lock(job->ConditionalMutex);
-			job->Executed = true;
-			job->Conditional.notify_all();
+				job->FunctionExecute();
+				std::unique_lock<std::mutex> lock(job->ConditionalMutex);
+				job->Executed = true;
+				job->Conditional.notify_all();
+			}
+
+			QueueJobMutex.unlock();
 		}
 	}
 	catch (int ex) {

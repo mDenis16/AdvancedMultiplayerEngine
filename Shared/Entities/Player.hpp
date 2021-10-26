@@ -1,4 +1,7 @@
 #pragma once
+#include "Network/NetworkPacket.hpp"
+
+
 
 class Player : public Ped
 {
@@ -10,8 +13,11 @@ public:
 	Player(ENetPeer* sPeer, std::uint32_t Handle);
 #endif
 
-	Player(Entity& ent);
+	Player(EntityStruct& ent);
 
+	
+	void CreateMove(NetworkPacket* packet) override;
+	
 	Player(std::uint32_t Handle);
 	~Player();
 

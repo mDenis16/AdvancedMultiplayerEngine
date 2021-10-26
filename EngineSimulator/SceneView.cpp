@@ -1,5 +1,5 @@
 #include <raylib.h>
-#include "SceneView.hpp"
+
 #include <functional>
 #include <iostream>
 #include <glm\glm.hpp>
@@ -9,6 +9,11 @@
 #include <Client/Network.hpp>
 #include <Client/Client.hpp>
 #include "Multiplayer.hpp"
+#include <Network/NetworkPacket.hpp>
+#include <Entities/Entities.hpp>
+#include <Gridmap/Grid.hpp>
+
+#include "SceneView.hpp"
 
 void SceneView::Init()
 {
@@ -28,6 +33,7 @@ static float angleBetween(
 }
 #define MAX_COLUMNS 20
 
+
 void SceneView::OnRender()
 {
 	//--------------------------------------------------------------------------------------
@@ -44,11 +50,11 @@ void SceneView::OnRender()
 
     // Define the camera to look into our 3d world (position, target, up vector)
     Camera3D camera = { 0 };
-  
-    camera.position = Vector3{ -350.0f, 120.0f, 100.0f };
-    camera.target = Vector3{ 0.0f, 1.8f, 0.0f };
+    //-763.4022, 7.327758, 40.59016
+    camera.position = Vector3{ 10.0f, 30.0f, 10.0f };
+    camera.target = Vector3{ 0.0f, 0.0f, 0.0f };
     camera.up = Vector3{ 0.0f, 1.0f, 0.0f };
-    camera.fovy = 65.0f;
+    camera.fovy = 125.0f;
     camera.projection = CAMERA_PERSPECTIVE;
 
     //auto gridvIew = new Grid<int>(glm::vec3(-250, -250, 0), glm::vec3(250, 250, 0), glm::vec3(30, 30, 0));
@@ -62,8 +68,10 @@ void SceneView::OnRender()
     while (!WindowShouldClose())                // Detect window close button or ESC key
     {
 
-        
+        camera.position = Vector3{ scene.localPosition.x ,scene.localPosition.z + 120, scene.localPosition.y };
 
+        camera.target = Vector3{ scene.localPosition.x ,scene.localPosition.z, scene.localPosition.y };
+ 
 
         UpdateCamera(&camera);                  // Update camera
    
@@ -74,10 +82,10 @@ void SceneView::OnRender()
         BeginMode3D(camera);
 
   
-         if (IsKeyDown(KEY_RIGHT)) localPosition.y += 3.0f;
-         if (IsKeyDown(KEY_LEFT)) localPosition.y -= 3.0f;
-         if (IsKeyDown(KEY_UP)) localPosition.x += 3.0f;
-         if (IsKeyDown(KEY_DOWN)) localPosition.x -= 3.0f;
+         if (IsKeyDown(KEY_RIGHT)) localPosition.y += 0.2f;
+         if (IsKeyDown(KEY_LEFT)) localPosition.y -= 0.2f;
+         if (IsKeyDown(KEY_UP)) localPosition.x += 0.2f;
+         if (IsKeyDown(KEY_DOWN)) localPosition.x -= 0.2f;
 
 
          std::clamp(localPosition.x, Multiplayer.grid->_min.x, Multiplayer.grid->_max.x);
@@ -93,13 +101,30 @@ void SceneView::OnRender()
 
             //DrawSphereEx(Vector3{ center.x, center.z, center.y }, 5.f, 5, 5, RED);
            
-         
+            
 
            
             
         }
         
         DrawSphere(Vector3{ localPosition.x, localPosition.z, localPosition.y }, 5.f, MAGENTA);
+        {
+
+           std::lock_guard<std::mutex> guard(Multiplayer.streamLock);
+            
+                for (auto& ent : Multiplayer.StreamedEntities)
+                {
+                  auto render =   ent->Interpolation();
+               
+                   std::cout << "Entity interpolated position X: " << ent->renderData.Position.x << " Y: " << ent->renderData.Position.y << " Z: " << ent->renderData.Position.z << std::endl;
+
+
+                	//-763.4022, 7.327758, 40.59016
+                    DrawSphereEx(Vector3{ ent->Position.x ,  ent->Position.z ,  ent->Position.y }, 5.f, 5, 5, BLACK);
+                    DrawSphereEx(Vector3{ render.Position.x ,  render.Position.z ,  render.Position.y }, 5.f, 5, 5, RED);
+                }
+            
+        }
 
         EndMode3D();
         localCell = Multiplayer.grid->getCell(glm::vec3(localPosition.x, localPosition.y, localPosition.z));

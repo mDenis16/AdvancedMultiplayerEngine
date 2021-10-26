@@ -107,5 +107,8 @@
     <ClInclude Include="..\Shared\Gridmap\Grid.hpp">
       <Filter>Shared\Grid</Filter>
     </ClInclude>
+    <ClInclude Include="..\Shared\ClientCmd\LagRecord.hpp">
+      <Filter>Shared\ClientCmd</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

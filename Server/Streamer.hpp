@@ -12,9 +12,9 @@ public:
 
 	SAFE_PROP(Grid<Entity*>*, grid);
 	VARIABLE_THREAD(HandleEntityStream);
-	SAFE_PROP(std::queue<Player*>, EntityStreamQueue);
+	SAFE_PROP(std::queue<Entity*>, EntityStreamQueue);
 
-	void UpdateStream(Player* player);
+	void UpdateStream(Entity* player);
 
 };
 

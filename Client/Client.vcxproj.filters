@@ -22,9 +22,6 @@
     <Filter Include="Shared">
       <UniqueIdentifier>{5028d8b4-cf14-480d-bc19-1178130a687e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shared\ClientCmd">
-      <UniqueIdentifier>{12da9a79-8403-4904-927f-fb84d4672f93}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Shared\Entities">
       <UniqueIdentifier>{bcd61580-d28e-41f7-8964-637462c3e658}</UniqueIdentifier>
     </Filter>
@@ -33,6 +30,9 @@
     </Filter>
     <Filter Include="Shared\Octree">
       <UniqueIdentifier>{4b8dade5-bb53-43d7-bcc7-f5d563a21a9f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shared\LagRecord">
+      <UniqueIdentifier>{12da9a79-8403-4904-927f-fb84d4672f93}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -75,8 +75,8 @@
     <ClInclude Include="..\Shared\Entities\Entities.hpp">
       <Filter>Shared\Entities</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\ClientCmd\ClientCmd.hpp">
-      <Filter>Shared\ClientCmd</Filter>
+    <ClInclude Include="..\Shared\ClientCmd\LagRecord.hpp">
+      <Filter>Shared\LagRecord</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\Octree\Octree.hpp">
       <Filter>Shared\Octree</Filter>
@@ -103,6 +103,9 @@
     </ClCompile>
     <ClCompile Include="Streamer.cpp">
       <Filter>Client\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Entities\Entity.cpp">
+      <Filter>Shared\Entities</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

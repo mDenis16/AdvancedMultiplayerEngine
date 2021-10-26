@@ -43,8 +43,12 @@ namespace EventsHooks {
 		
 		int evT = invoke<int>(0xD8F66A3A60C62153, eventGroup, eventIndex);
 
-		std::cout << "evT " << evT << std::endl;
-
+		std::cout << "Received event with index " << eventIndex << " argCount " << argCount << std::endl;
+		for (int i = 0; i < argCount; ++i)
+		{
+			std::cout << "Arg data " <<  "[" << i << "] = " << args[i] << std::endl;
+		}
+		
 		
 		return ret;
 	}

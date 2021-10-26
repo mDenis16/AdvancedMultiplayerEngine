@@ -147,9 +147,11 @@
   <ItemGroup>
     <ClCompile Include="EngineSimulator.cpp" />
     <ClCompile Include="Multiplayer.cpp" />
+    <ClCompile Include="Ped.cpp" />
     <ClCompile Include="SceneView.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Implementations.hpp" />
     <ClInclude Include="Multiplayer.hpp" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="SceneView.hpp" />

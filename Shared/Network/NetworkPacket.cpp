@@ -103,7 +103,7 @@ void NetworkPacket::Send()
 		GameNetwork.HandleOutgoingFlowMutexCondFlag = true;
 		GameNetwork.HandleOutgoingFlowMutexCond.notify_all();
 		}
-		std::cout << "Added packet outgoing to queue" << std::endl;
+	//	std::cout << "Added packet outgoing to queue" << std::endl;
 	}
 	
 #endif

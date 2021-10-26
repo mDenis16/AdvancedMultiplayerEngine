@@ -1,8 +1,10 @@
 #pragma once
 
 #include <thread>
-#include <Entities/Entity.hpp>
+
+#include <Shared/Shared.hpp>
 #include <Gridmap/Grid.hpp>
+
 
 class SceneView
 {

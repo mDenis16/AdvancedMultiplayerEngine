@@ -11,10 +11,11 @@ public:
 
 	SAFE_PROP(std::unordered_map <std::uint32_t COMMA Entity*>, Entities);
 
-	std::uint32_t lastHandle;
-	std::uint32_t GenerateHandle() { return ++lastHandle;  }
+	std::uint32_t lastHandle = 55;
+	std::uint32_t GenerateHandle() { return lastHandle++;  }
 
 	void OnClientConnect(ENetPeer* peer);
+	void OnClientDisconnect(ENetPeer* peer);
 
 	void Initialize(std::uint32_t port, int maxClients);
 
@@ -30,9 +31,7 @@ public:
 	SAFE_PROP(std::queue<NetworkPacket*>, IncomingPackets);
 	SAFE_PROP(std::queue<NetworkPacket*>, OutgoingPackets);
 
-	SAFE_PROP(std::vector<Player*>, Players);
 
-	
 	Streamer streamer;
 
 

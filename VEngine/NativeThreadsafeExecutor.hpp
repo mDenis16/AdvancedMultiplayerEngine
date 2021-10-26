@@ -43,7 +43,7 @@ namespace NativeThreadSafe {
 		}
 
 	};
-	
+
 
 	void ExecuteNativeQueue();
 

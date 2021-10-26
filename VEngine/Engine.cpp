@@ -3,6 +3,9 @@
 #include "Utilities.hpp"
 #include "Pointer.h"
 #include "Functions.hpp"
+#include "Multiplayer.hpp"
+#include "NativeThreadsafeExecutor.hpp"
+#include <VEngine\nativeList.hpp>
 #define fullHashMapDepth 24
 int Engine::GameVersionToSearchDepth(int version)
 {
@@ -133,5 +136,26 @@ void Engine::InitalizePointers() {
 	{
 		NativeInvoker.Initialize();
 
+	}
+}
+
+
+void Engine::MainScript()
+{
+	std::cout << "hello from main script " << std::endl;
+	while (true) {
+		/*if (GetAsyncKeyState(0x4C))
+		{
+			STREAMING::REQUEST_MODEL(0x705E61F2);
+			while (!STREAMING::HAS_MODEL_LOADED(0x705E61F2))
+				Wait(0);
+
+			std::cout << "Model has been loaded  " << std::endl;
+
+		}*/
+		NativeThreadSafe::ExecuteNativeQueue();
+
+		 Multiplayer.OnCreateMove();
+		Wait(0);
 	}
 }

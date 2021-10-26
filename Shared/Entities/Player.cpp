@@ -1,9 +1,8 @@
 
 #include <Common.hpp>
 #include <enet\enet.h>
-#include "Entity.hpp"
-#include "Ped.hpp"
-#include "Player.hpp"
+#include <Shared.hpp>
+
 
 #include <Shared.hpp>
 
@@ -16,13 +15,18 @@ Player::Player(ENetPeer* sPeer, std::uint32_t Handle)
 }
 #endif
 
-Player::Player(Entity& ent)
+Player::Player(EntityStruct& ent)
 {
 	this->EntityHandle = ent.EntityHandle;
 	this->IsNetworked =  true;
 	this->IsStreamed = true;
 	this->Position = ent.Position;
 	this->Type = EntityType::ET_Player;
+}
+
+void Player::CreateMove(NetworkPacket* packet)
+{
+	Ped::CreateMove(packet);
 }
 
 Player::Player(std::uint32_t Handle)

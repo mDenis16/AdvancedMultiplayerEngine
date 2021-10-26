@@ -166,6 +166,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Shared\ClientCmd\ClientCmd.hpp" />
+    <ClInclude Include="..\Shared\ClientCmd\LagRecord.hpp" />
     <ClInclude Include="..\Shared\Entities\Entities.hpp" />
     <ClInclude Include="..\Shared\Entities\Entity.hpp" />
     <ClInclude Include="..\Shared\Entities\Ped.hpp" />

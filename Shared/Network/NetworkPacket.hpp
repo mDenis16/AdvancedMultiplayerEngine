@@ -1,5 +1,7 @@
 #pragma once
 
+class Entity;
+
 enum  PacketFlags
 {
 	None = 1 << 0,
@@ -12,12 +14,11 @@ enum PacketType
 	PlayerJoin = 1,
 	EntitiesStreamIn = 2,
 	PlayerCreateMove = 3,
-	EntitiesStreamOut = 4
+	EntitiesStreamOut = 4,
+	PlayerLeave = 5
 };
 class NetworkPacket {
 public:
-
-	~NetworkPacket();
 
 
 #if SERVER
@@ -96,7 +97,7 @@ public:
 	inline size_t Read(T& dst)
 	{
 		size_t sz = ReadRaw(&dst, sizeof(T));
-		assert(sz == sizeof(T));
+		//assert(sz == sizeof(T));
 		return sz;
 	}
 
@@ -119,4 +120,7 @@ public:
 		Write(len);
 		WriteRaw(src.c_str(), src.size());
 	}
+
+	~NetworkPacket();
+
 };

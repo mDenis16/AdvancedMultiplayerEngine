@@ -19,22 +19,16 @@ void Network::ProcessStreamOut(NetworkPacket* packet)
 	
 		{
 			
-			std::lock_guard<std::mutex> guard(streamLock);
-
+			
 			{
-				auto idx = std::find_if(RenderedEntities.begin(), RenderedEntities.end(), [EntityHandle](Entity* s) {
-					return s->EntityHandle == EntityHandle;
-					});
-				if (idx != RenderedEntities.end())
-					RenderedEntities.erase(idx);
-			}
+				std::lock_guard<std::mutex> guard(streamLock);
 
-			{
 				auto idx = std::find_if(StreamedEntities.begin(), StreamedEntities.end(), [EntityHandle](Entity* s) {
 					return s->EntityHandle == EntityHandle;
 					});
 				if (idx != StreamedEntities.end()) {
 					EntityStreamOut(*idx);
+				//	(*idx)->lagRecords.clear();
 					StreamedEntities.erase(idx);
 				}
 			}
@@ -59,7 +53,7 @@ void Network::ProcessStream(NetworkPacket* packet)
 
 	for (uint32_t i = 0; i < numEntities; i++) {
 
-		Entity Serialized;
+		EntityStruct Serialized;
 
 		packet->Read(Serialized.EntityHandle);
 		packet->Read(Serialized.Type);
@@ -75,7 +69,11 @@ void Network::ProcessStream(NetworkPacket* packet)
 				std::lock_guard<std::mutex> guard(streamLock);
 				StreamedEntities.push_back(player);
 				RenderedEntities.push_back(player);
+
 			}
+			player->Position = Serialized.Position;
+			player->RenderPosition = Serialized.Position;
+		
 
 			EntityStreamIn(player);
 		}

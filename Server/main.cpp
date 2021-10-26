@@ -6,7 +6,7 @@ int main() {
 	Server server;
 
 
-	server.Initialize(5555);
+	server.Initialize(22005);
 
 	while(true)
 	{

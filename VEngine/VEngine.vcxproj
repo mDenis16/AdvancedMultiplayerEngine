@@ -124,7 +124,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;VENGINE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;VENGINE_EXPORTS;_WINDOWS;_USRDLL;CLIENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -166,6 +166,7 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="gtaThread.h" />
     <ClInclude Include="Hooks.hpp" />
+    <ClInclude Include="Implementations.hpp" />
     <ClInclude Include="jooat.hpp" />
     <ClInclude Include="Multiplayer.hpp" />
     <ClInclude Include="NativeInvoker.hpp" />
@@ -175,6 +176,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="Pointer.h" />
     <ClInclude Include="NativeThreadsafeExecutor.hpp" />
+    <ClInclude Include="Script.hpp" />
     <ClInclude Include="ScriptHook.hpp" />
     <ClInclude Include="script_handler.hpp" />
     <ClInclude Include="script_id.hpp" />
@@ -200,6 +202,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Ped.cpp" />
+    <ClCompile Include="Script.cpp" />
     <ClCompile Include="ScriptHook.cpp" />
     <ClCompile Include="Utilities.cpp" />
     <ClCompile Include="VmtHook.cpp" />
