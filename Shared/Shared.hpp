@@ -31,14 +31,20 @@ poolname##thread = new std::thread(bbind);
 
 #define THREAD_WAIT(poolname) \
 std::unique_lock<std::mutex> lock##poolname(poolname##Mutex); \
-poolname##MutexCond.wait(lock##poolname, [this]{ return poolname##MutexCondFlag.load(); });   
+poolname##MutexCond.wait_for(lock##poolname, \
+std::chrono::seconds(1000), \
+[this]() { return poolname##MutexCondFlag.load(); });
+
+
+//poolname##MutexCond.wait(lock##poolname, [this]{ return poolname##MutexCondFlag.load(); });   
 
 #define THREAD_WAKE(poolname) \
 poolname##MutexCondFlag = true; \
 poolname##MutexCond.notify_one();
 
 #define THREAD_SLEEP(poolname) \
-poolname##MutexCondFlag = false; 
+poolname##MutexCondFlag = false; \
+poolname##MutexCond.notify_one();
 
 #define COMMA ,
 

@@ -20,22 +20,25 @@ public:
 	void Initialize(std::uint32_t port, int maxClients);
 
 
-
 	static void OnNetworkReleaseMessage(ENetPacket* packet) { delete (NetworkPacket*)packet->userData; }
 
-	VARIABLE_THREAD(HandleFlow);
-	VARIABLE_THREAD(HandleIncomingFlow);
-	VARIABLE_THREAD(HandleOutgoingFlow);
+	VARIABLE_THREAD(ProcessNetwork);
+	VARIABLE_THREAD(NetworkThread);
+	VARIABLE_THREAD(GameLogic);
+	
 
 
-	SAFE_PROP(std::queue<NetworkPacket*>, IncomingPackets);
-	SAFE_PROP(std::queue<NetworkPacket*>, OutgoingPackets);
+	static inline std::uint32_t CurrentFrameTime;
+	//SAFE_PROP(std::queue<NetworkPacket*>, IncomingPackets);
+	//SAFE_PROP(std::queue<NetworkPacket*>, OutgoingPackets);
 
-
+	std::condition_variable m_action_cond;
+	std::mutex m_action_lock;
+	std::queue<NetworkPacket*> m_actions;
+	
 	Streamer streamer;
 
-
-	ENetHost* HostListener = nullptr;
+	SAFE_PROP(ENetHost*, HostListener);
 };
 
 inline Network GameNetwork;

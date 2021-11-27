@@ -88,4 +88,22 @@ namespace Memory {
 	{
 		return ptr != nullptr;
 	}
+
+	template <typename type>
+	type as_relative(type address, int offset = 3)
+	{
+		return reinterpret_cast<type>(reinterpret_cast<uintptr_t>(address) + *reinterpret_cast<int*>(reinterpret_cast<uintptr_t>(address) + offset) + (offset + 4i32));
+	}
+
+	template <typename type = uintptr_t>
+	type as_relative(void* address, int offset = 3)
+	{
+		return reinterpret_cast<type>(reinterpret_cast<uintptr_t>(address) + *reinterpret_cast<int*>(reinterpret_cast<uintptr_t>(address) + offset) + (offset + 4i32));
+	}
+
+	template <typename type = uintptr_t>
+	type as_relative(uintptr_t address, int offset = 3)
+	{
+		return (type)(address + *reinterpret_cast<int*>(address + offset) + (offset + 4i32));
+	}
 }

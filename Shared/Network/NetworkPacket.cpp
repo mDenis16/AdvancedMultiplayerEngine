@@ -1,4 +1,3 @@
-
 #include <Common.hpp>
 #include <Shared.hpp>
 #include <enet\enet.h>
@@ -25,17 +24,17 @@
 /// <param name="Packetflags"></param>
 /// <param name="except"></param>
 /// <param name="Reliable"></param>
-NetworkPacket::NetworkPacket(int packetType, std::vector<Entity*> batch, int Packetflags , ENetPeer* except, bool Reliable )
+NetworkPacket::NetworkPacket(int packetType, std::vector<Entity*>& batch, int Packetflags , ENetPeer* except, bool Reliable )
 {
 	
 	Outgoing = true;
 	Type = packetType;
-	EntitiesBatch = batch;
+	EntitiesBatch = &batch;
 	ExceptPeer = except;
 	TargetPeer = nullptr;
 
 	this->PacketFlags |= StreamRangeEntities;
-
+	//https://i.imgur.com/nB5LR8C.png
 	Write(Type);
 }
 
@@ -95,21 +94,46 @@ void NetworkPacket::Send()
 {
 #if SERVER
 	{
-		{
+		/*{
 			std::lock_guard<std::mutex> guard(GameNetwork.OutgoingPackets_lock);
 			GameNetwork.OutgoingPackets.push(this);
 		}
 		{std::lock_guard<std::mutex> guard2(GameNetwork.HandleOutgoingFlowMutex);
 		GameNetwork.HandleOutgoingFlowMutexCondFlag = true;
 		GameNetwork.HandleOutgoingFlowMutexCond.notify_all();
-		}
+		}*/
+		
+			//SAFE_READ(GameNetwork.HostListener);
+			ENetPacket* newPacket = enet_packet_create(mData, Lenght,  ENET_PACKET_FLAG_NO_ALLOCATE);
+			//newPacket->userData = this;
+			//newPacket->freeCallback = OnNetworkReleaseMessage;
+			if (this->PacketFlags & StreamEntireNetwork)
+			{
+				
+			} 
+			else if (this->PacketFlags & StreamRangeEntities)
+			{
+				for (auto& batch : *this->EntitiesBatch)
+				{
+					if (batch && batch->Peer != this->ExceptPeer && batch->Type == EntityType::ET_Player)
+						enet_peer_send(batch->Peer, 0, newPacket);
+				}
+			}
+			else
+			{
+				enet_peer_send(this->TargetPeer, 0, newPacket);
+			}
+
+		//	this->EntitiesBatch.shrink_to_fit();
+
+		
 	//	std::cout << "Added packet outgoing to queue" << std::endl;
 	}
 	
 #endif
 
 #if CLIENT
-	{
+	/*{
 		std::lock_guard<std::mutex> guard(Multiplayer.OutgoingPackets_lock);
 		Multiplayer.OutgoingPackets.push(this);
 	}
@@ -118,7 +142,12 @@ void NetworkPacket::Send()
      	Multiplayer.HandleOutgoingFlowMutexCondFlag = true;
 	    Multiplayer.HandleOutgoingFlowMutexCond.notify_all();
 
-	}
+	}*/
+	ENetPacket* newPacket = enet_packet_create(mData, Lenght,  ENET_PACKET_FLAG_NO_ALLOCATE);
+	newPacket->userData = this;
+	//newPacket->freeCallback = OnNetworkReleaseMessage;
+	enet_peer_send(Multiplayer.Peer, 0, newPacket);
+	
 #endif
 
 	//Flags |= ENET_PACKET_FLAG_NO_ALLOCATE;

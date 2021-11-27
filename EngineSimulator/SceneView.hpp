@@ -12,6 +12,7 @@ public:
 	void Init();
 
 	glm::vec3 localPosition = glm::vec3(0,0,0);
+	float localHeading = 0.f;
 
 	GridCell<Entity*>* localCell;
 

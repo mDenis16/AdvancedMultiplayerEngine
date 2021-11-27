@@ -10,8 +10,8 @@ public:
 	//~Network();
 
 
-	VARIABLE_THREAD(HandleFlow);
-	VARIABLE_THREAD(HandleIncomingFlow);
+	VARIABLE_THREAD(ProcessNetwork);
+	VARIABLE_THREAD(NetworkThread);
 	VARIABLE_THREAD(HandleOutgoingFlow);
 
 
@@ -29,7 +29,7 @@ public:
 
 	virtual void EventDisconnect() = 0;
 	virtual void EventConnect() = 0;
-	virtual void OnEntityCreateMove(Entity* entity) = 0;
+	virtual void OnEntityCreateMove(Entity* entity, NetworkPacket* packet) = 0;
 	virtual void HandlePacket(NetworkPacket* packet) = 0;
 	virtual void EntityStreamIn(Entity* ent) = 0;
 	virtual void EntityStreamOut(Entity* ent) = 0;
@@ -50,13 +50,31 @@ public:
 	std::vector<Entity*> StreamedEntities;
 	std::atomic<bool> Connected{ false };
 	std::atomic<bool> Running{ false };
-
+	
 	int NetworkTickrate = 30;
 
+	int LastPacketId = 0;
+
 	Grid<Entity*>* grid = nullptr;
+
+	std::mutex gridLock;
 
 	void ProcessStreamOut(NetworkPacket* packet);
 
 	void ProcessStream(NetworkPacket* packet);
 
+	static inline std::uint32_t CurrentFrameTime;
+
+
+
+	void OnCreateMove();
+
+	void OnFrameBegin();
+
+
+	ClockTime connectedTime;
+
+	std::condition_variable m_action_cond;
+	std::mutex m_action_lock;
+	std::queue<NetworkPacket*> m_actions;
 };

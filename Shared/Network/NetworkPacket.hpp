@@ -30,7 +30,7 @@ public:
 /// <param name="Packetflags"></param>
 /// <param name="except"></param>
 /// <param name="Reliable"></param>
-	NetworkPacket(int packetType, std::vector<Entity*> batch, int Packetflags = 0, ENetPeer* except = nullptr, bool Reliable = false);
+	NetworkPacket(int packetType, std::vector<Entity*>& batch, int Packetflags = 0, ENetPeer* except = nullptr, bool Reliable = false);
 
 	/// <summary>
 	/// Send packet to one peer or entire network
@@ -46,7 +46,7 @@ public:
 
 
 
-	std::vector<Entity*> EntitiesBatch;
+	std::vector<Entity*>* EntitiesBatch = nullptr;
 
 
 
@@ -81,6 +81,11 @@ public:
 	size_t Lenght = 0;
 	size_t LenghtAllocated = 0;
 
+	void Reset()
+	{
+		Current = 0;
+	}
+
 	ENetPacket* Packet = nullptr;
 	ENetPeer* TargetPeer = nullptr;
 	ENetPeer* ExceptPeer = nullptr;
@@ -97,7 +102,7 @@ public:
 	inline size_t Read(T& dst)
 	{
 		size_t sz = ReadRaw(&dst, sizeof(T));
-		//assert(sz == sizeof(T));
+		assert(sz == sizeof(T));
 		return sz;
 	}
 

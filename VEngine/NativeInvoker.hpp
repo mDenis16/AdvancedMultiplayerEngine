@@ -109,8 +109,6 @@ public:
 		}*/
 	}
 
-
-private:
 	NativeCallContext CallContext;
 	std::unordered_map<RAGE::ScrNativeHash, RAGE::ScrNativeHandler> HandlerCache;
 };

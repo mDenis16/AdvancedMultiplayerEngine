@@ -15,7 +15,7 @@ namespace NativeThreadSafe {
 		std::mutex ConditionalMutex;
 		std::condition_variable Conditional;
 		std::atomic<bool> Executed;
-		std::vector<int> Callbacks;
+		std::vector<std::uint64_t> Callbacks;
 
 		std::function<void()> FunctionExecute;
 		void WaitforCallback() {

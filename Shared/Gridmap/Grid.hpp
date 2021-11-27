@@ -40,8 +40,9 @@ public:
 
 
 				cell.maxs = glm::vec3(cell.mins.x + _cellSize.x, cell.mins.y + _cellSize.y, 0);
-
+				cell.Items.reserve(200);
 				cells.push_back(cell);
+				
 
 			}
 	}

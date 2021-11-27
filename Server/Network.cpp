@@ -19,16 +19,24 @@ void Network::OnClientConnect(ENetPeer* peer)
 
 	auto newPlayer = new Player(peer, GenerateHandle());
 	peer->data = newPlayer;
-
+	//newPlayer->EntitiesInStreamRange.reserve(5000);
 
 	SAFE_READ(Entities);
 	Entities[newPlayer->EntityHandle] = newPlayer;
 
-	//auto packet = new NetworkPacket(PacketType::PlayerJoin, nullptr, true, 0, peer);
+	for (int i = 0; i < 1; ++i)
+	{
+		auto newPed = new Ped(GenerateHandle());
+		newPed->Controller = newPlayer;
 
-	//packet->Write(newPlayer->EntityHandle);
+		newPlayer->controlledPeds.push_back(newPed);
+		Entities[newPed->EntityHandle] = newPed;
+		newPed->cellIndex = 0;
+		newPed->oldCellIndex = 0;
 
-	//packet->Send();
+	}
+
+	
 }
 
 void Network::OnClientDisconnect(ENetPeer* peer)
@@ -73,106 +81,6 @@ void Network::OnClientDisconnect(ENetPeer* peer)
 
 	delete player;
 }
-
-/// <summary>
-/// Handles outgoing flow
-/// </summary>
-///
-///
-///
-///
-void Network::HandleOutgoingFlow()
-{
-	debug("NetworkThread : Create => HandleOutgoingFlow");
-	while (true)
-	{
-		THREAD_WAIT(HandleOutgoingFlow)
-		SAFE_MODIFY(OutgoingPackets);
-
-		while (OutgoingPackets.size() > 0)
-		{
-			NetworkPacket* message = OutgoingPackets.front();
-			OutgoingPackets.pop();
-
-
-			ENetPacket* newPacket = enet_packet_create(message->mData, message->Lenght,
-			                                           ENET_PACKET_FLAG_RELIABLE | ENET_PACKET_FLAG_NO_ALLOCATE);
-			newPacket->userData = message;
-			newPacket->freeCallback = OnNetworkReleaseMessage;
-
-			if (message->PacketFlags & StreamEntireNetwork)
-			{
-				/*SAFE_READ(Players);
-				for (auto player : Players)
-					if (player->Peer != message->ExceptPeer) {
-						enet_peer_send(player->Peer, 0, newPacket);
-					}*/
-			} /*else if (message->PacketFlags & StreamRangeNetwork)
-			{
-				auto player = (Player*)message->TargetPeer->data;
-				if (player) {
-					
-					std::lock_guard<std::mutex> guard(player->EntitiesInStreamRangeMutex);
-					for (auto streamed : player->EntitiesInStreamRange) {
-						if (streamed->Type == EntityType::ET_Player)
-						enet_peer_send(streamed->Peer, 0, newPacket);
-					}
-						
-				}
-			}*/
-			else if (message->PacketFlags & StreamRangeEntities)
-			{
-				for (auto batch : message->EntitiesBatch)
-				{
-					if (batch->Peer != message->ExceptPeer && batch->Type == EntityType::ET_Player)
-						enet_peer_send(batch->Peer, 0, newPacket);
-				}
-			}
-			else
-			{
-				enet_peer_send(message->TargetPeer, 0, newPacket);
-			}
-
-			//		std::cout << "Sent packet type " << message->Type << " with size of " << sizeof(message->mData) << std::endl;
-		}
-
-		THREAD_SLEEP(HandleOutgoingFlow);
-	}
-}
-
-void Network::HandleFlow()
-{
-	debug("\nNetworkThread : Create => HandleFlow");
-	while (true)
-	{
-		ENetEvent ev;
-		bool NeedWake = false;
-		while (enet_host_service(HostListener, &ev, 0) > 0)
-			if (ev.type == ENET_EVENT_TYPE_CONNECT)
-			{
-				OnClientConnect(ev.peer);
-			}
-			else if (ev.type == ENET_EVENT_TYPE_DISCONNECT)
-			{
-				OnClientDisconnect(ev.peer);
-			}
-			else if (ev.type == ENET_EVENT_TYPE_RECEIVE)
-			{
-				SAFE_MODIFY(IncomingPackets);
-
-				auto receivedPacket = new NetworkPacket(ev.peer, ev.packet);
-
-				IncomingPackets.push(receivedPacket);
-				NeedWake = true;
-			}
-
-		if (NeedWake)
-			THREAD_WAKE(HandleIncomingFlow);
-
-			Sleep(1000 / 60);
-	}
-}
-
 void Network::Initialize(std::uint32_t port, int maxClients)
 {
 	enet_initialize();
@@ -190,45 +98,103 @@ void Network::Initialize(std::uint32_t port, int maxClients)
 
 	std::cout << "Listening on port " << port << std::endl;
 
-	streamer.Init(1, 500);
+	streamer.Init(1, 300);
 
-	THREAD_START(HandleIncomingFlow, std::bind(&Network::HandleIncomingFlow, this));
-	THREAD_START(HandleOutgoingFlow, std::bind(&Network::HandleOutgoingFlow, this));
-	THREAD_START(HandleFlow, std::bind(&Network::HandleFlow, this));
+
+	THREAD_START(ProcessNetwork, std::bind(&Network::ProcessNetwork, this));
+
+
+	THREAD_START(NetworkThread, std::bind(&Network::NetworkThread, this));
+	//THREAD_START(HandleIncomingFlow, std::bind(&Network::HandleIncomingFlow, this));
+	//THREAD_START(HandleOutgoingFlow, std::bind(&Network::HandleOutgoingFlow, this));
+
 }
 
-void Network::HandleIncomingFlow()
+/// <summary>
+/// Handles outgoing flow
+/// </summary>
+///
+///
+///
+///
+
+void Network::ProcessNetwork()
 {
-	debug("NetworkThread : Create => HandleIncomingFlow");
+	/*_CrtSetDbgFlag(
+		_CRTDBG_ALLOC_MEM_DF |
+		_CRTDBG_LEAK_CHECK_DF);
+	_CrtSetReportMode(_CRT_ERROR,
 
-	while (true)
-	{
-		THREAD_WAIT(HandleIncomingFlow);
+		_CRTDBG_MODE_DEBUG);*/
+	while (1) {
+		
 
-		SAFE_MODIFY(IncomingPackets);
+		std::unique_lock<std::mutex> lock(m_action_lock);
 
-		while (IncomingPackets.size())
-		{
-			NetworkPacket* message = IncomingPackets.front();
+		Network::CurrentFrameTime = enet_time_get();
 
-
-			message->MarkAsExecuted();
-
-			auto targetPlayer = static_cast<Player*>(message->TargetPeer->data);
-
-
-			if (targetPlayer)
-				PacketHandler::Process(targetPlayer, message);
-
-
-			IncomingPackets.pop();
-			if (message->Executed)
-			{
-				delete message;
-			}
+		while (m_actions.empty()) {
+			std::cout << "m_actions empty " << std::endl;
+			m_action_cond.wait(lock);
 		}
+		std::cout << "Process network " << std::endl;
 
+		auto a = m_actions.front();
+		m_actions.pop();
 
-		THREAD_SLEEP(HandleIncomingFlow);
+		lock.unlock();
+		auto targetPlayer = static_cast<Player*>(a->TargetPeer->data);
+		PacketHandler::Process(targetPlayer, a);
+
 	}
 }
+
+void Network::NetworkThread()
+{
+	/*_CrtSetDbgFlag(
+		_CRTDBG_ALLOC_MEM_DF |
+		_CRTDBG_LEAK_CHECK_DF);
+	_CrtSetReportMode(_CRT_ERROR,
+		_CRTDBG_MODE_DEBUG);*/
+	debug("\nNetworkThread : Create => HandleFlow");
+	while (true)
+	{
+	//	debug("\nNetworkThread : Run => HandleFlow");
+		//SAFE_READ(HostListener);
+
+		ENetEvent ev;
+
+
+		bool needUpdate = true;
+
+		while (enet_host_service(HostListener, &ev, 1) > 0) {
+			if (ev.type == ENET_EVENT_TYPE_CONNECT)
+			{
+				OnClientConnect(ev.peer);
+			}
+			else if (ev.type == ENET_EVENT_TYPE_DISCONNECT)
+			{
+				OnClientDisconnect(ev.peer);
+			}
+			else if (ev.type == ENET_EVENT_TYPE_RECEIVE)
+			{
+				//debug("\nReceived event ");
+
+				auto receivedPacket = new NetworkPacket(ev.peer, ev.packet);
+				{
+					std::lock_guard<std::mutex> guard(m_action_lock);
+				//	std::cout << "Received packet type " << receivedPacket->Type << std::endl;
+					m_actions.push(receivedPacket);
+				}
+				
+				m_action_cond.notify_one();
+
+			}
+
+			
+		}
+	
+		
+	}
+}
+

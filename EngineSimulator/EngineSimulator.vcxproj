@@ -146,11 +146,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="EngineSimulator.cpp" />
+    <ClCompile Include="EntityPrediction.cpp" />
     <ClCompile Include="Multiplayer.cpp" />
     <ClCompile Include="Ped.cpp" />
     <ClCompile Include="SceneView.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="EntityPrediction.h" />
     <ClInclude Include="Implementations.hpp" />
     <ClInclude Include="Multiplayer.hpp" />
     <ClInclude Include="pch.h" />

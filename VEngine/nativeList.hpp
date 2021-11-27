@@ -2,6 +2,7 @@
 #include <winnt.h>
 #include "natives.hpp"
 #include "NativeInvoker.hpp"
+#include "Game.hpp"
 
 template <typename Ret, typename ...Args>
 FORCEINLINE Ret invoke(RAGE::ScrNativeHash hash, Args &&...args)
@@ -18,69 +19,7 @@ FORCEINLINE Ret invoke(RAGE::ScrNativeHash hash, Args &&...args)
 	}
 }
 #define NATIVE_DECL __declspec(noinline) inline
-struct Vector2
-{
-	float x, y;
 
-	Vector2()
-		: x(0.f)
-		, y(0.f)
-	{ }
-
-	Vector2(float x, float y)
-		: x(x)
-		, y(y)
-	{ }
-};
-
-struct Vector3
-{
-public:
-	alignas(8) float x;
-	alignas(8) float y;
-	alignas(8) float z;
-
-public:
-	Vector3()
-		: x(0.f)
-		, y(0.f)
-		, z(0.f)
-	{ }
-
-	Vector3(float x, float y, float z)
-		: x(x)
-		, y(y)
-		, z(z)
-	{ }
-
-	Vector3(float arr[3])
-		: x(arr[0])
-		, y(arr[1])
-		, z(arr[2])
-	{ }
-};
-
-struct Vector4
-{
-	float x;
-	float y;
-	float z;
-	float w;
-
-	Vector4()
-		: x(0.f)
-		, y(0.f)
-		, z(0.f)
-		, w(0.f)
-	{ }
-
-	Vector4(float x, float y, float z, float w)
-		: x(x)
-		, y(y)
-		, z(z)
-		, w(w)
-	{ }
-};
 typedef DWORD Void;
 typedef DWORD Any;
 typedef DWORD uint;
@@ -4144,7 +4083,7 @@ namespace ENTITY
 	static void _0x5C48B75732C8456C(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5) { invoke<Void>(0x5C48B75732C8456C, p0, p1, p2, p3, p4, p5); } // 0x5C48B75732C8456C b791
 
 	static void _0xFD1695C5D3B05439(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5) { invoke<Void>(0xFD1695C5D3B05439, p0, p1, p2, p3, p4, p5); } // 0xFD1695C5D3B05439 b791
-
+	static void _SET_ENTITY_ANGULAR_VELOCITY(GameEntity entity, float x, float y, float z) { invoke<Void>(0x8339643499D1222E, entity, x, y, z); }
 																																								// Attaches entity1 to bone (boneIndex) of entity2.
 																																								//
 																																								// boneIndex - this is different to boneID, use GET_PED_BONE_INDEX to get the index from the ID. use the index for attaching to specific bones. entity1 will be attached to entity2's centre if bone index given doesn't correspond to bone indexes for that entity type.

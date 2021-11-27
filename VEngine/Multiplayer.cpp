@@ -3,11 +3,16 @@
 
 #include "nativeList.hpp"
 #include "NativeThreadsafeExecutor.hpp"
+#include <glm/gtx/rotate_vector.hpp>
+
 //#include <VEngine\nativeList.hpp>
 #include "Engine.hpp"
 #include "Implementations.hpp"
 #include <cmath>
 #define nearbyPedArraySize 100
+#define TIME_DELAY 70
+
+auto genericMove = {"idle", "idle_intro", "idle_transition", "idle_turn_l_0", "idle_turn_l_-180", "idle_turn_l_-90", "idle_turn_r_0", "idle_turn_r_180", "idle_turn_r_90", "rstart_l_0", "rstart_l_-180", "rstart_l_-90", "rstart_r_0", "rstart_r_180", "rstart_r_90", "rstop_l", "rstop_quick_l", "rstop_quick_r", "rstop_r", "run", "run_down", "run_down_slope", "run_turn_180_l", "run_turn_180_r", "run_turn_l2", "run_turn_l3", "run_turn_r2", "run_turn_r3", "run_up", "run_up_slope", "runtowalk_left", "runtowalk_right", "sprint", "sprint_turn_l", "sprint_turn_r", "walk", "walk_down", "walk_down_slope", "walk_turn_180_l", "walk_turn_180_r", "walk_turn_l3", "walk_turn_l4", "walk_turn_r3", "walk_turn_r4", "walk_up", "walk_up_slope", "walktorun_left", "walktorun_right", "wstart_l_0", "wstart_l_-180", "wstart_l_-90", "wstart_r_0", "wstart_r_180", "wstart_r_90", "wstop_l_0", "wstop_l_180", "wstop_l_-180", "wstop_l_90", "wstop_l_-90", "wstop_quick_l_0", "wstop_quick_r_0", "wstop_r_0", "wstop_r_180", "wstop_r_-180", "wstop_r_90", "wstop_r_-90"};
 inline uint32_t hashGet(const char* str)
 {
 	size_t len = strlen(str);
@@ -69,7 +74,7 @@ nearbyEnts arr;
 
 			while (!STREAMING::HAS_MODEL_LOADED(model))
 				Engine::Wait(1);
-	
+
 			PLAYER::SET_PLAYER_MODEL(PLAYER::GET_PLAYER_INDEX(), model);
 			PED::SET_PED_DEFAULT_COMPONENT_VARIATION(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(PLAYER::GET_PLAYER_INDEX()));
 		});
@@ -101,7 +106,7 @@ void MultiplayerNetwork::EntityStreamIn(Entity* ent)
 
 
 	NativeThreadSafe::QueueJob* Job = new NativeThreadSafe::QueueJob();
-	Job->Callbacks.resize(1);
+	Job->Callbacks.resize(2);
 	Job->Execute([Job, model, position]
 		{       STREAMING::REQUEST_MODEL(model);
 	while (!STREAMING::HAS_MODEL_LOADED(model))
@@ -112,6 +117,7 @@ void MultiplayerNetwork::EntityStreamIn(Entity* ent)
 	auto ret = PED::CREATE_PED(1, model, position.x, position.y, position.z, 0, true, true);
 
 	Job->Callbacks[0] = ret;
+	Job->Callbacks[1] = Engine::HandleToPointer(ret);
 
 	while (!ENTITY::DOES_ENTITY_EXIST(ret))
 		Engine::Wait(0);
@@ -139,6 +145,7 @@ void MultiplayerNetwork::EntityStreamIn(Entity* ent)
 	Job->WaitforCallback();
 
 	ent->GameHandle = Job->Callbacks[0];
+	ent->MemoryHandle = Job->Callbacks[1];
 
 	delete Job;
 
@@ -167,8 +174,45 @@ void MultiplayerNetwork::EntityStreamOut(Entity* ent)
 
 	}
 }
+float Lerp(float a, float b, float lerpFactor)
+{
+	float result = ((1.f - lerpFactor) * a) + (lerpFactor * b);
+	return result;
+}
 
-void MultiplayerNetwork::OnEntityCreateMove(Entity* entity)
+float LerpDegrees(float a, float b, float lerpFactor) // Lerps from angle a to b (both between 0.f and 360.f), taking the shortest path
+{
+	float result;
+	float diff = b - a;
+	if (diff < -180.f)
+	{
+		// lerp upwards past 360
+		b += 360.f;
+		result = Lerp(a, b, lerpFactor);
+		if (result >= 360.f)
+		{
+			result -= 360.f;
+		}
+	}
+	else if (diff > 180.f)
+	{
+		// lerp downwards past 0
+		b -= 360.f;
+		result = Lerp(a, b, lerpFactor);
+		if (result < 0.f)
+		{
+			result += 360.f;
+		}
+	}
+	else
+	{
+		// straight lerp
+		result = Lerp(a, b, lerpFactor);
+	}
+
+	return result;
+}
+void MultiplayerNetwork::OnEntityCreateMove(Entity* entity,  NetworkPacket* packet)
 {
 	if (entity->Type == EntityType::ET_Player)
 	{
@@ -184,40 +228,94 @@ float angleBetween(
 	glm::vec3 db = glm::normalize(b - origin);
 	return glm::acos(glm::dot(da, db));
 }
+float angle_diff(float destAngle, float srcAngle) {
+	float delta = 0.f;
+
+	delta = fmodf(destAngle - srcAngle, 360.0f);
+	if (destAngle > srcAngle) {
+		if (delta >= 180)
+			delta -= 360;
+	}
+	else {
+		if (delta <= -180)
+			delta += 360;
+	}
+	return delta;
+}
 /// <summary>
 /// Called somewhere in game thread 20 ticks per second
 /// </summary>
+///	inline float TICKRATE = 70.f;
+inline float TICKRATE = 70.f;
+
 void MultiplayerNetwork::OnCreateMove()
 {
-	if (Connected) {
-		static bool first_time = false;
 
-		if (!first_time || ClockDuration(Clock::now() - lastCreateMove).count() > 1000 / 20)
+	if (Connected) {
+		static uint32_t lastCreateMove = 0;
+		static float lastSentHeading = 0.f;
+		static glm::vec3 lastSentPosition = glm::vec3(0, 0, 0);
+
+		static glm::vec3 pos = glm::vec3(0, 0, 0);
+		std::uint32_t currentTickRate = (CurrentFrameTime - lastCreateMove);
+
+
+		if (currentTickRate >= TIME_DELAY)
 		{
-			first_time = true;
-			lastCreateMove = Clock::now();
+		
+			lastCreateMove = CurrentFrameTime;
 
 			auto localPed = PLAYER::GET_PLAYER_PED(0);
 			if (localPed) {
 				LagRecord cmd;
-
+				
 
 				auto position = ENTITY::GET_ENTITY_COORDS(localPed, true);
+				glm::vec3 vecPosition = glm::vec3(position.x, position.y, position.z);
+
 				auto rotation = ENTITY::GET_ENTITY_ROTATION(localPed, 2);
 				auto velocity = ENTITY::GET_ENTITY_VELOCITY(localPed);
+				float heading = ENTITY::GET_ENTITY_HEADING(localPed);
+				glm::vec3 velocitySinceLastUpdate = vecPosition - pos;
 
-				cmd.Position = glm::vec3(position.x, position.y, position.z);
-				cmd.ForwardSpeed = ENTITY::GET_ENTITY_SPEED(localPed);
-				cmd.Rotation = glm::vec3(rotation.x, rotation.y, rotation.z);;
-				cmd.Velocity = glm::vec3(velocity.x, velocity.y, velocity.z);;
-				cmd.Heading = ENTITY::GET_ENTITY_HEADING(localPed);
+				
+				cmd.RawVelocity = glm::vec3(velocity.x, velocity.y, velocity.z);
+				
+				cmd.Position = vecPosition;
 
+				cmd.ForwardSpeed = 0.f;
+
+				cmd.Heading = 0.f;
+				float HeadingDiff = heading - lastSentHeading;
+
+
+				lastSentHeading = heading;
+				cmd.Velocity = glm::vec3(0, 0, 0);
+				cmd.tickCount = CurrentFrameTime;
+				cmd.clientTickcount = CurrentFrameTime;
+
+
+				if (velocitySinceLastUpdate != glm::vec3(0, 0, 0))
+				{
+					cmd.Velocity = glm::normalize(velocitySinceLastUpdate);
+					cmd.ForwardSpeed = glm::distance(vecPosition, pos) / (float)TIME_DELAY;
+				}
+				if (HeadingDiff != 0.f)
+				{
+					cmd.HeadingShadow = heading;
+					cmd.Heading = HeadingDiff / (float)TIME_DELAY;
+					cmd.HeadingSpeed = std::fabs(HeadingDiff) / (float)TIME_DELAY;
+				}
+
+
+				cmd.tickCount = CurrentFrameTime;
+				cmd.clientTickcount = CurrentFrameTime;
 
 				cmd.cellIndex = grid->getCell(cmd.Position)->_index;
-				printf(" LOCAL PED ROTATION >> X: %f Y: %f Z: %f  \n", cmd.Rotation.x, cmd.Rotation.y, cmd.Rotation.z);
+				printf(" LOCAL PED POSITION >> X: %f Y: %f Z: %f  \n", position.x, position.y, position.z);
 
 				cmd.MoveType = 0;
-
+				pos = vecPosition;
 				if (BRAIN::IS_PED_WALKING(localPed)) {
 					cmd.MoveType = 1;
 				}
@@ -227,10 +325,19 @@ void MultiplayerNetwork::OnCreateMove()
 				else if (BRAIN::IS_PED_SPRINTING(localPed)) {
 					cmd.MoveType = 3;
 				}
+				/*if (!STREAMING::HAS_ANIM_DICT_LOADED("move_m@generic"))
+					STREAMING::REQUEST_ANIM_DICT("move_m@generic");
 
+				for(auto& anim : genericMove)
+				{
+                  if (ENTITY::IS_ENTITY_PLAYING_ANIM(localPed, "move_m@generic", anim, false))
+                  {
+					  std::cout << "Found active animation " << anim <<  std::endl;
+					  break;
+                  }
+				}*/
 
 				NetworkCreateLagRecord(cmd);
-
 
 			}
 
@@ -238,146 +345,100 @@ void MultiplayerNetwork::OnCreateMove()
 		}
 
 
-		if (Multiplayer.streamLock.try_lock()) {
+		{
+			while(!Multiplayer.streamLock.try_lock())
+				Engine::Wait(1);
+
 			auto localPed = PLAYER::GET_PLAYER_PED(0);
 			if (localPed) {
 				auto localPositionGta = ENTITY::GET_ENTITY_COORDS(localPed, true);
 
 				auto localPosition = glm::vec3(localPositionGta.x, localPositionGta.y, localPositionGta.z);
 
-				for (auto& ent : Multiplayer.StreamedEntities)
+				auto localVelocityGta = ENTITY::GET_ENTITY_VELOCITY(localPed);
+				auto localVelocityRotationGta = ENTITY::GET_ENTITY_ROTATION_VELOCITY(localPed);
+
+				auto localRotation = ENTITY::GET_ENTITY_ROTATION(localPed, 2);
+
+				for (auto& entity : Multiplayer.StreamedEntities)
 				{
-					if (ent->GameHandle && ENTITY::DOES_ENTITY_EXIST(ent->GameHandle))
+					if (entity->GameHandle && ENTITY::DOES_ENTITY_EXIST(entity->GameHandle))
 					{
 
-						auto render = ent->Interpolation();
+					
 
-						//printf("REMOTE ROTATION >> X: %f Y: %f Z: %f  \n", render.Rotation.x, render.Rotation.y, render.Rotation.z);
-						auto coordsgta = ENTITY::GET_ENTITY_COORDS(ent->GameHandle, true);
+						vector3 entityPos = ENTITY::GET_ENTITY_COORDS(entity->GameHandle, true);
+						glm::vec3 Position = glm::vec3(entityPos.x, entityPos.y, entityPos.z);
 
-						auto coords = glm::vec3(coordsgta.x, coordsgta.y, coordsgta.z);
-						std::cout << " updating streamed entity " << std::endl;
-						glm::vec3 direction = render.Position - coords;
+						
 
-					//	GRAPHICS::DRAW_LINE(coords.x, coords.y, coords.z, render.Position.x, render.Position.y, render.Position.z, 255, 0, 0, 255);
+						ENTITY::SET_ENTITY_NO_COLLISION_ENTITY(entity->GameHandle, localPed, false);
+						ENTITY::SET_ENTITY_NO_COLLISION_ENTITY(localPed, entity->GameHandle, false);
+						ENTITY::SET_ENTITY_COLLISION(entity->GameHandle, false, false);
+						
+	
+						if (entity->Velocity != glm::vec3(0, 0, 0)) {
 
-						ENTITY::APPLY_FORCE_TO_ENTITY(ent->GameHandle, 1, direction.x, direction.y, direction.z, 0.0f, 0.0f, 0.0f, 0, 0, 1, 1, 0, 1);
-					//	ENTITY::SET_ENTITY_QUATERNION(ent->GameHandle, render.Quaternion.x, render.Quaternion.y, render.Quaternion.z, render.Quaternion.w);
+							const glm::vec3 averageDir = (entity->Velocity + (entity->ShadowPosition - entity->Position)) / 2.f;
 
-						if (ent->Type == EntityType::ET_Player) {
-							auto player = (Player*)ent;
-							float distance = glm::distance(coords, localPosition);
+							glm::vec3 Direction = glm::normalize(averageDir);
+							glm::vec3 VelocityPerFrame = Direction * entity->EntitySpeed * TICKRATE;
 
-							if (player->lagRecords_lock.try_lock()) {
+							entity->Position += VelocityPerFrame;
+							//ENTITY::SET_ENTITY_VELOCITY(entity->GameHandle, VelocityPerFrame.x, VelocityPerFrame.y, VelocityPerFrame.z);
 
-
-								for (int i = 0; i < player->lagRecords.size(); i += 2)
-								{
-
-									if (i > 0 && i + 1 < player->lagRecords.size()) {
-										auto current = player->lagRecords.at(i);
-										auto after = player->lagRecords.at(i + 1);
-										if (current.MoveType == OFMT_Still)
-											GRAPHICS::DRAW_LINE(current.Position.x, current.Position.y, current.Position.z, after.Position.x, after.Position.y, after.Position.z, 0, 0, 255, 255);
-										else if (current.MoveType == OFMT_Walking)
-											GRAPHICS::DRAW_LINE(current.Position.x, current.Position.y, current.Position.z, after.Position.x, after.Position.y, after.Position.z, 12, 215, 0, 255);
-										else  if (current.MoveType == OFMT_Walking)
-											GRAPHICS::DRAW_LINE(current.Position.x, current.Position.y, current.Position.z, after.Position.x, after.Position.y, after.Position.z, 150, 100, 15, 255);
-										else  if (current.MoveType == OFMT_Sprinting)
-											GRAPHICS::DRAW_LINE(current.Position.x, current.Position.y, current.Position.z, after.Position.x, after.Position.y, after.Position.z, 255, 0, 0, 255);
-										else  if (current.MoveType == OFMT_Running)
-											GRAPHICS::DRAW_LINE(current.Position.x, current.Position.y, current.Position.z, after.Position.x, after.Position.y, after.Position.z, 150, 25, 150, 255);
-
-									}
-								}
-
-								if (player->lagRecords.size() > 2)
-								{
-									auto& cmd = player->lagRecords.back();
-									auto& previous = player->lagRecords.at(player->lagRecords.size() - 2);
-									auto distance = glm::distance(coords, cmd.Position);
-									auto pedHeading = ENTITY::GET_ENTITY_HEADING(player->GameHandle);
-
-									std::cout << "mata merge se fte " << std::endl;
-
-									//if (distance <= 0.15f)
-									//{
-
-									//}
-									//else if (distance <= 1.25f) // Walking
-									//{
-									//	/*Function.Call(Hash.TASK_GO_STRAIGHT_TO_COORD, Character, Position.X, Position.Y, Position.Z, 1.0f, -1, Character.Heading, 0.0f);
-									//	Function.Call(Hash.SET_PED_DESIRED_MOVE_BLEND_RATIO, Character, 1.0f);*/
-
-									//	BRAIN::TASK_GO_STRAIGHT_TO_COORD(player->GameHandle, cmd.Position.x, cmd.Position.y, cmd.Position.z, 1.0f, -1, pedHeading, 0.0f);
-									//	BRAIN::SET_PED_DESIRED_MOVE_BLEND_RATIO(player->GameHandle, 1.0f);
-
-									//}
-									//else if (distance > 1.75f) // Sprinting
-									//{
-									//	/*Function.Call(Hash.TASK_GO_STRAIGHT_TO_COORD, Character, Position.X, Position.Y, Position.Z, 3.0f, -1, Character.Heading, 2.0f);
-									//	Function.Call(Hash.SET_RUN_SPRINT_MULTIPLIER_FOR_PLAYER, Character, 1.49f);
-									//	Function.Call(Hash.SET_PED_DESIRED_MOVE_BLEND_RATIO, Character, 3.0f);*/
-
-
-									//	BRAIN::TASK_GO_STRAIGHT_TO_COORD(player->GameHandle, cmd.Position.x, cmd.Position.y, cmd.Position.z, 3.0f, -1, pedHeading, 2.0f);
-									//	PLAYER::SET_RUN_SPRINT_MULTIPLIER_FOR_PLAYER(player->GameHandle, 1.49f);
-									//	BRAIN::SET_PED_DESIRED_MOVE_BLEND_RATIO(player->GameHandle, 3.0f);
-
-									//}
-									//else // Running
-									//{
-
-									//	/*Function.Call(Hash.TASK_GO_STRAIGHT_TO_COORD, Character, Position.X, Position.Y, Position.Z, 4.0f, -1, Character.Heading, 1.0f);
-									//	Function.Call(Hash.SET_PED_DESIRED_MOVE_BLEND_RATIO, Character, 2.0f);*/
-
-									//	BRAIN::TASK_GO_STRAIGHT_TO_COORD(player->GameHandle, cmd.Position.x, cmd.Position.y, cmd.Position.z, 4.0f, -1, pedHeading, 1.0f);
-									//	BRAIN::SET_PED_DESIRED_MOVE_BLEND_RATIO(player->GameHandle, 2.0f);
-									//}
-
-									glm::vec3 predicted = cmd.Position + (cmd.Position - previous.Position) + cmd.Velocity * 1.05f;
-									
-
-									if (distance > 0.15f)
-									{
-										if (cmd.MoveType == OFMT_Still) {
-											BRAIN::TASK_STAND_STILL(player->GameHandle, -1);
-
-										}
-										else if (cmd.MoveType == OFMT_Walking) {
-											BRAIN::TASK_GO_STRAIGHT_TO_COORD(player->GameHandle, predicted.x, predicted.y, predicted.z, 1.0f, -1, pedHeading, 0.0f);
-											BRAIN::SET_PED_DESIRED_MOVE_BLEND_RATIO(player->GameHandle, 1.0f);
-
-										}
-										else if (cmd.MoveType == OFMT_Sprinting) {
-											BRAIN::TASK_GO_STRAIGHT_TO_COORD(player->GameHandle, predicted.x, predicted.y, predicted.z, 3.0f, -1, pedHeading, 1.0f);
-											PLAYER::SET_RUN_SPRINT_MULTIPLIER_FOR_PLAYER(player->GameHandle, 1.49f);
-											BRAIN::SET_PED_DESIRED_MOVE_BLEND_RATIO(player->GameHandle, 3.0f);
-										}
-										else if (cmd.MoveType == OFMT_Running) {
-											BRAIN::TASK_GO_STRAIGHT_TO_COORD(player->GameHandle, predicted.x, predicted.y, predicted.z, 4.0f, -1, pedHeading, 2.0f);
-											BRAIN::SET_PED_DESIRED_MOVE_BLEND_RATIO(player->GameHandle, 2.0f);
-
-										}
-										GRAPHICS::DRAW_LINE(cmd.Position.x, cmd.Position.y, cmd.Position.z, predicted.x, predicted.y, predicted.z, 125, 255, 255, 255);
-									}
-
-									//MULTIPLAYER::GAME_PED::UpdatePedWalkingAnimation((Ped*)ent);
-
-									
-								}
-
-								player->lagRecords_lock.unlock();
-							}
+							ENTITY::SET_ENTITY_COORDS_NO_OFFSET(entity->GameHandle, entity->Position.x, entity->Position.y, entity->Position.z, false, false, false);
 						}
+						
+						//ENTITY::_SET_ENTITY_ANGULAR_VELOCITY(entity->GameHandle, lvec.x, lvec.y, lvec.z);
+
+						//glm::vec3 lvc = glm::vec3(localVelocityGta.x, localVelocityGta.y, localVelocityGta.z);
+						//pos = localPosition;
+
+						//ENTITY::SET_ENTITY_COORDS_NO_OFFSET(entity->GameHandle, pos.x, pos.y, pos.z + 1.f, false, false, false);
+						//ENTITY::SET_ENTITY_HEADING(entity->GameHandle, interpolatedHeading);
+
+
+						//ENTITY::SET_ENTITY_HEADING(ent->GameHandle, headingInterpolated);
+
+						//GRAPHICS::DRAW_LINE(Lerped.x, Lerped.y, Lerped.z, localPosition.x, localPosition.y, localPosition.z, 125, 255, 255, 255);
+					
+						//glm::vec3 predicted = Lerped + direction * 2.05f;
+
+					/*	GRAPHICS::DRAW_LINE(predicted.x, predicted.y, predicted.z, localPosition.x, localPosition.y, localPosition.z, 255, 0, 0, 255);
+						
+							Player* player = (Player*)ent;
+
+							std::cout << "player->PedMoveType << " << player->PedMoveType << std::endl;
+							if (player->PedMoveType == OFMT_Still ) {
+								BRAIN::TASK_STAND_STILL(ent->GameHandle, -1);
+
+							}
+							else if (player->PedMoveType == OFMT_Walking && !BRAIN::IS_PED_WALKING(localPed)) {
+								BRAIN::TASK_GO_STRAIGHT_TO_COORD(ent->GameHandle, predicted.x, predicted.y, predicted.z, 1.0f, -1, ent->Heading, 0.0f);
+								BRAIN::SET_PED_DESIRED_MOVE_BLEND_RATIO(ent->GameHandle, 1.0f);
+
+							}
+							else if (player->PedMoveType == OFMT_Sprinting && !BRAIN::IS_PED_SPRINTING(localPed)) {
+								BRAIN::TASK_GO_STRAIGHT_TO_COORD(ent->GameHandle, predicted.x, predicted.y, predicted.z, 3.0f, -1, ent->Heading, 1.0f);
+								PLAYER::SET_RUN_SPRINT_MULTIPLIER_FOR_PLAYER(ent->GameHandle, 1.49f);
+								BRAIN::SET_PED_DESIRED_MOVE_BLEND_RATIO(ent->GameHandle, 3.0f);
+							}
+							else if (player->PedMoveType == OFMT_Running && !BRAIN::IS_PED_RUNNING(localPed)) {
+								BRAIN::TASK_GO_STRAIGHT_TO_COORD(ent->GameHandle, predicted.x, predicted.y, predicted.z, 4.0f, -1, ent->Heading, 2.0f);
+								BRAIN::SET_PED_DESIRED_MOVE_BLEND_RATIO(ent->GameHandle, 2.0f);
+
+							}*/
+
+							
+
 					}
 				}
 			}
 
 			Multiplayer.streamLock.unlock();
 		}
-
 	}
-
-
 }
+
+

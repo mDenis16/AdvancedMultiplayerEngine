@@ -1,112 +1,19 @@
 #include "pch.h"
-#include "Engine.hpp"
+
+
 #include "Utilities.hpp"
 #include "Pointer.h"
 #include "Functions.hpp"
+#include "Engine.hpp"
 #include "Multiplayer.hpp"
 #include "NativeThreadsafeExecutor.hpp"
 #include <VEngine\nativeList.hpp>
-#define fullHashMapDepth 24
-int Engine::GameVersionToSearchDepth(int version)
-{
-	switch (version) {
-	case 0:
-	case 1:
-		return 0;
-	case 2:
-	case 3:
-		return 1;
-	case 4:
-	case 5:
-		return 2;
-	case 6:
-	case 7:
-	case 8:
-	case 9:
-		return 3;
-	case 10:
-	case 11:
-		return 4;
-	case 12:
-	case 13:
-		return 5;
-	case 14:
-	case 15:
-		return 6;
-	case 16:
-	case 17:
-		return 7;
-	case 18:
-	case 19:
-		return 8;
-	case 20:
-	case 21:
-	case 22:
-	case 23:
-		return 9;
-	case 24:
-	case 25:
-		return 10;
-	case 26:
-	case 27:
-		return 11;
-	case 28:
-	case 29:
-		return 12;
-	case 30:
-	case 31:
-	case 32:
-	case 33:
-		return 13;
-	case 34:
-	case 35:
-		return 14;
-	case 36:
-	case 37:
-		return 15;
-	case 38:
-	case 39:
-		return 16;
-	case 40:
-	case 41:
-		return 17;
-	case 42:
-	case 43:
-	case 44:
-	case 45:
-		return 18;
-	case 46:
-	case 47:
-	case 48:
-	case 49:
-		return 19;
-	case 50:
-	case 51:
-	case 52:
-	case 53:
-		return 20;
-	case 54:
-	case 55:
-	case 56:
-	case 57:
-	case 58:
-		return 21;
-	case 59:
-	case 60:
-	case 61:
-	case 62:
-	case 63:
-		return 22;
-	case 64:
-	case 65:
-	case 66:
-	case 67:
-	case 68:
-		return 23;
-	default:
-		return fullHashMapDepth - 1;
-	}
-}
+
+#include "Pattern.hpp"
+static std::pair<RAGE::GtaThread*, int> org_thread;
+static uint32_t* g_thread_id;
+static uint32_t* g_thread_count;
+RAGE::GtaThread* managedThread;
 
 void Engine::InitalizePointers() {
 
@@ -126,12 +33,36 @@ void Engine::InitalizePointers() {
 
 		Functions::m_script_threads = ptr.sub(4).rip().sub(8).as<decltype(Functions::m_script_threads)>();
 		Functions::m_run_script_threads = ptr.sub(0x1F).as<Functions::run_script_threads_t>();
+	} {
+		PointerToHandle = (pointer_to_handle_t)MEMORY::PatternScan("48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC 20 8B 15 ? ? ? ? 48 8B F9 48 83 C1 10 33 DB");
+
+		HandleToPointer = (handle_to_pointer_t)MEMORY::PatternScan("83 f9 ff 74 31 4c 8b 0d ? ? ? ? 44 8b c1 49 8b 41 08");
 	}
 	{
 		GameVersion = Functions::GetGameVersion();
 		std::cout << "Game version " << GameVersion << std::endl;
 	}
+	{
+		
+		ReplayInterface = *Memory::as_relative<CReplayInterface**>(MEMORY::PatternScan("48 8D 0D ? ? ? ? 48 8B D7 E8 ? ? ? ? 48 8D 0D ? ? ? ? 8A D8 E8 ? ? ? ? 84 DB 75 13 48 8D 0D"));
+	
+	}
+	{
 
+		auto g_scriptHandlerMgrPattern = Memory::pattern("74 17 48 8B C8 E8 ? ? ? ? 48 8D 0D");
+
+		auto location = g_scriptHandlerMgrPattern.count(1).get(0).get<char>(13);
+		g_scriptHandlerMgr = reinterpret_cast<decltype(g_scriptHandlerMgr)>(location + *(int32_t*)location + 4);
+
+		location = Memory::pattern("FF 40 5C 8B 15 ? ? ? ? 48 8B").count(1).get(0).get<char>(5);
+		g_thread_id = reinterpret_cast<decltype(g_thread_id)>(location + *(int32_t*)location + 4);
+		 printf("ScriptHook: g_thread_id %llx", g_thread_id);
+
+		location -= 9;
+		g_thread_count = reinterpret_cast<decltype(g_thread_count)>(location + *(int32_t*)location + 4);
+
+		printf("ScriptHook: g_thread_count %llx", g_thread_count);
+	}
 
 	{
 		NativeInvoker.Initialize();
@@ -143,7 +74,7 @@ void Engine::InitalizePointers() {
 void Engine::MainScript()
 {
 	std::cout << "hello from main script " << std::endl;
-	while (true) {
+	//while (true) {
 		/*if (GetAsyncKeyState(0x4C))
 		{
 			STREAMING::REQUEST_MODEL(0x705E61F2);
@@ -153,9 +84,63 @@ void Engine::MainScript()
 			std::cout << "Model has been loaded  " << std::endl;
 
 		}*/
+
+
 		NativeThreadSafe::ExecuteNativeQueue();
 
-		 Multiplayer.OnCreateMove();
-		Wait(0);
+		Multiplayer.CurrentFrameTime = enet_time_get();
+
+		Multiplayer.OnCreateMove();
+
+		
+
+	//	Wait(0);
+//	}
+}
+
+void Engine::AttachScriptThread(RAGE::GtaThread* new_thread)
+{
+	// get a free thread slot
+	auto collection = rage::script_thread_array;
+	int slot = 0;
+
+	for (auto& thread : *collection)
+	{
+		auto context = thread->GetContext();
+		if (context->ThreadId == 0)
+		{
+			break;
+		}
+
+		slot++;
 	}
+
+	// did we get a slot?
+	if (slot == collection->count())
+	{
+		return;
+	}
+
+	new_thread->reset((*g_thread_count) + 1, nullptr, 0);
+
+	if (*g_thread_id == 0) {
+		(*g_thread_id)++;
+	}
+
+	new_thread->m_context.m_thread_id = *g_thread_id;
+	new_thread->m_handler = g_script_handler_manager;
+
+	(*g_thread_id)++;
+	(*g_thread_count)++;
+
+	org_thread = std::pair<RAGE::GtaThread*, int>(collection->at(slot), slot);
+
+	collection->set(slot, new_thread);
+
+	printf("ScriptHook: Attached a new script thread with id: %d at %llx\n", new_thread->m_instance_id, new_thread);
+}
+
+bool EngineWorker::Initialize()
+{
+	return false;
 }

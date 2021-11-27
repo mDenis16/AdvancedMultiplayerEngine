@@ -25,7 +25,7 @@ void PacketHandler::Process(Player* player, NetworkPacket* packet)
 	case PlayerCreateMove:
 	{
 		player->CreateMove(packet);
-		
+		std::cout << "Processing PlayerCreateMove " << std::endl;
 	}
 	break;
 	}

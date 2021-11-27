@@ -22,6 +22,9 @@
     <Filter Include="Multiplayer\Implementations">
       <UniqueIdentifier>{b7992dbf-6e3e-4471-b401-d57e0a7231bf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Multiplayer\Prediction">
+      <UniqueIdentifier>{e8cd0974-4170-44c5-bc7f-7e70b48c41a8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="EngineSimulator.cpp">
@@ -36,6 +39,9 @@
     <ClCompile Include="Ped.cpp">
       <Filter>Multiplayer\Implementations</Filter>
     </ClCompile>
+    <ClCompile Include="EntityPrediction.cpp">
+      <Filter>Multiplayer\Prediction</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SceneView.hpp">
@@ -49,6 +55,9 @@
     </ClInclude>
     <ClInclude Include="Implementations.hpp">
       <Filter>Multiplayer\Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityPrediction.h">
+      <Filter>Multiplayer\Prediction</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

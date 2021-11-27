@@ -9,6 +9,7 @@ public:
 
 #if SERVER
 	std::vector<Entity*> inStream;
+	std::vector<Ped*> controlledPeds;
 
 	Player(ENetPeer* sPeer, std::uint32_t Handle);
 #endif

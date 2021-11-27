@@ -164,6 +164,7 @@
     <ClInclude Include="enums.hpp" />
     <ClInclude Include="EventsHooks.hpp" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="Game.hpp" />
     <ClInclude Include="gtaThread.h" />
     <ClInclude Include="Hooks.hpp" />
     <ClInclude Include="Implementations.hpp" />

@@ -12,6 +12,8 @@
 #include "NativeThreadsafeExecutor.hpp"
 #include <VEngine\Script.hpp>
 
+#include "Pattern.hpp"
+
 namespace Hooks {
 
 	void* run_script_threads_original = nullptr;
@@ -21,38 +23,67 @@ namespace Hooks {
 ;
 	void* m_main_fiber;
 	void* m_script_fiber;
+	void* m_on_game_frame;
 
+
+	void* on_game_frame_original = nullptr;
 
 	static  int numFrames = 0;
 	static int startTime = -1;
 	void Wait(int ms);
 
 
+	void on_game_frame_hook()
+	{
+		std::cout << "Hello from game frame " << std::endl;
+
+	}
 ;
 
 	bool run_script_threads(std::uint32_t ops_to_execute)
 	{
-		if (Engine::FailedInitialize) return false;
+		//if (Engine::FailedInitialize) return false;
 
-		auto ret = static_cast<decltype(&run_script_threads)>(run_script_threads_original)(ops_to_execute);
+		TRY_CLAUSE
+		{
 
-	
-			
-		return ret;
-		
+			static bool Init = false;
+
+		if (GetAsyncKeyState(0x45)) {
+			SCRIPT::_BEGIN_ENUMERATING_THREADS();
+			int id = SCRIPT::_GET_ID_OF_NEXT_THREAD_IN_ENUMERATION();
+
+			while (id != 0) {
+				id = SCRIPT::_GET_ID_OF_NEXT_THREAD_IN_ENUMERATION();
+				if (id != 0) {
+					SCRIPT::TERMINATE_THREAD(id);
+					std::cout << "Terminated thread  id "  <<  id <<  std::endl;
+				}
+				std::cout << "Found script running under name " << SCRIPT::_GET_NAME_OF_THREAD(id) << std::endl;
+			}
+		}
+
+
+	      	return static_cast<decltype(&run_script_threads)>(run_script_threads_original)(ops_to_execute);
+		} EXCEPT_CLAUSE
+		return static_cast<decltype(&run_script_threads)>(run_script_threads_original)(ops_to_execute);
 	}
 
 
 	bool is_dlc_present(std::uint32_t hash)
 	{
-		
-		
+
 
 		static bool ensure_main_fiber = (ConvertThreadToFiber(nullptr), true);
 		static bool notInitialized = true;
-
-		Engine::mainScriptt.tick();
-
+		static uint64_t	last = 0;
+		uint64_t		cur = GAMEPLAY::GET_FRAME_COUNT();
+		/*if (last != cur)
+		{
+			last = cur;*/
+			Engine::mainScriptt.tick();
+		//}
+	
 
 		return static_cast<decltype(&is_dlc_present)>(is_dlc_present_original)(hash);
 	}
@@ -85,12 +116,25 @@ namespace Hooks {
 				return;
 			}
 
+			auto ptr = MEMORY::PatternScan("83 3F 00 76 ? FF D5 39");
 
-			if (MH_CreateHook(address, &is_dlc_present, reinterpret_cast<void**>(&is_dlc_present_original)) != MH_OK) {
+			auto addr = Memory::pattern("85 F6 78 ? 75 ? 83 FB 01 75").count(1).get(0).get<char>(-0x2A);
+
+
+		
+			if (MH_CreateHook(addr, &on_game_frame_hook, reinterpret_cast<void**>(&on_game_frame_original)) != MH_OK) {
+				Engine::FailedInitialize = true;
+				std::cout << "Failed hooking on_game_frame " << std::endl;
+				MessageBoxA(nullptr, "Failed hooking on_game_frame ", "Error", MB_OK | MB_ICONQUESTION);
+				return;
+			}
+
+
+			/*if (MH_CreateHook(address, &is_dlc_present, reinterpret_cast<void**>(&is_dlc_present_original)) != MH_OK) {
 				Engine::FailedInitialize = true;
 				std::cout << "Failed hooking run is dlc present " << std::endl;
 				return;
-			}
+			}*/
 
 			if (MH_CreateHook(Functions::m_run_script_threads, &run_script_threads, reinterpret_cast<void**>(&run_script_threads_original)) != MH_OK) {
 				Engine::FailedInitialize = true;

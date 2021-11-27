@@ -4,8 +4,6 @@
 #include <Shared.hpp>
 
 
-#include <Shared.hpp>
-
 #if SERVER
 Player::Player(ENetPeer* sPeer, std::uint32_t Handle)
 {

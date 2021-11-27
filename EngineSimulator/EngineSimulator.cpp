@@ -18,12 +18,8 @@ int main()
 {
     Multiplayer.Initialize();
 
-    std::cout << "Enter server ip: " << std::endl;
-
-    std::string ip;
-    std::cin >> ip;
-
-     Multiplayer.Connect(ip.c_str(), 22005);
+  
+     Multiplayer.Connect("aimware.go.ro", 22005);
 
 
      scene.Init();

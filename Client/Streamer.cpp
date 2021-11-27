@@ -72,12 +72,26 @@ void Network::ProcessStream(NetworkPacket* packet)
 
 			}
 			player->Position = Serialized.Position;
-			player->RenderPosition = Serialized.Position;
-		
+	
 
 			EntityStreamIn(player);
+		}
+		else if (Serialized.Type == EntityType::ET_Ped)
+		{
+			auto ped = new Ped(Serialized);
+			{
+				std::lock_guard<std::mutex> guard(streamLock);
+				StreamedEntities.push_back(ped);
+				RenderedEntities.push_back(ped);
+
+			}
+			ped->Position = Serialized.Position;
+			
+
+			EntityStreamIn(ped);
 		}
 	
 		
 	}
 }
+

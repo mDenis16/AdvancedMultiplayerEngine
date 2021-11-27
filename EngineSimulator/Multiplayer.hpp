@@ -11,7 +11,7 @@ public:
 
 	void EntityStreamIn(Entity* ent) override;
 	void EntityStreamOut(Entity* ent) override;
-	void OnEntityCreateMove(Entity* entity) override;
+	void OnEntityCreateMove(Entity* entity, NetworkPacket* packet) override;
 	void OnCreateMove();
 
 	ClockTime lastCreateMove;
@@ -19,3 +19,4 @@ public:
 };
 
 inline MultiplayerNetwork Multiplayer;
+#define TIME_DELAY 70

@@ -9,6 +9,7 @@
 
 #include "Multiplayer.hpp"
 #include "nativeList.hpp"
+#include "GameRender.hpp"
 
 
 unsigned long WINAPI initialize(void* instance) {
@@ -31,7 +32,8 @@ unsigned long WINAPI initialize(void* instance) {
     Hooks::Initialize();
 
  
-   Multiplayer.Initialize();
+   //Multiplayer.Initialize();
+   //GameRender::Initialize();
 
     while (!Engine::FailedInitialize) {
 
@@ -48,8 +50,6 @@ unsigned long WINAPI initialize(void* instance) {
             NATIVE_END()
         }
         if (GetAsyncKeyState(0x4B)) {
-
-            Multiplayer.Connect("aimware.go.ro", 22005);
 
      
           
@@ -99,6 +99,7 @@ unsigned long WINAPI initialize(void* instance) {
     std::cout << "Failed initialize. Closing" << std::endl;
 
     Multiplayer.Destroy();
+    GameRender::Destruct();
 
     std::cout << "Destroying multiplayer " << std::endl;
     Sleep(1000);
